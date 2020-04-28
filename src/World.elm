@@ -1,4 +1,4 @@
-module World exposing (Error, Instruction(..), World, execute)
+module World exposing (Error, Instruction(..), World, executeAll, world)
 
 
 type World
@@ -7,19 +7,24 @@ type World
         }
 
 
-execute : List Instruction -> World -> Result Error World
-execute instructions start =
+world : Robot -> World
+world robot =
+    World { robot = robot }
+
+
+executeAll : List Instruction -> World -> Result Error World
+executeAll instructions start =
     let
         actOn : Instruction -> Result Error World -> Result Error World
-        actOn instruction world =
-            Result.andThen (perform instruction) world
+        actOn instruction aWorld =
+            Result.andThen (execute instruction) aWorld
     in
     List.foldl actOn (Ok start) instructions
 
 
-perform : Instruction -> World -> Result Error World
-perform instruction (World world) =
-    Ok <| World { world | robot = interpret instruction world.robot }
+execute : Instruction -> World -> Result Error World
+execute instruction (World aWorld) =
+    Ok <| World { aWorld | robot = interpret instruction aWorld.robot }
 
 
 interpret : Instruction -> Robot -> Robot
