@@ -75,7 +75,73 @@ suite =
                                     |> executeAll [ Forward ]
                         in
                         Expect.equal expected result
-                , describe "left"
+                , describe "right"
+                    [ test "facing North" <|
+                        \_ ->
+                            let
+                                expected =
+                                    location 0 0
+                                        |> robot East
+                                        |> world
+                                        |> Ok
+
+                                result =
+                                    location 0 0
+                                        |> robot North
+                                        |> world
+                                        |> executeAll [ Right ]
+                            in
+                            Expect.equal expected result
+                    , test "facing East" <|
+                        \_ ->
+                            let
+                                expected =
+                                    location 0 0
+                                        |> robot South
+                                        |> world
+                                        |> Ok
+
+                                result =
+                                    location 0 0
+                                        |> robot East
+                                        |> world
+                                        |> executeAll [ Right ]
+                            in
+                            Expect.equal expected result
+                    , test "facing South" <|
+                        \_ ->
+                            let
+                                expected =
+                                    location 0 0
+                                        |> robot West
+                                        |> world
+                                        |> Ok
+
+                                result =
+                                    location 0 0
+                                        |> robot South
+                                        |> world
+                                        |> executeAll [ Right ]
+                            in
+                            Expect.equal expected result
+                    , test "facing West" <|
+                        \_ ->
+                            let
+                                expected =
+                                    location 0 0
+                                        |> robot North
+                                        |> world
+                                        |> Ok
+
+                                result =
+                                    location 0 0
+                                        |> robot West
+                                        |> world
+                                        |> executeAll [ Right ]
+                            in
+                            Expect.equal expected result
+                    ]
+                 , describe "left"
                     [ test "facing North" <|
                         \_ ->
                             let
