@@ -1,10 +1,48 @@
-module World exposing (Error, execute, Instruction(..), World)
+module World exposing (Error, Instruction(..), World, execute)
 
 
 type World
     = World
         { robot : Robot
         }
+
+
+execute : List Instruction -> World -> Result Error World
+execute instructions start =
+    let
+        actOn : Instruction -> Result Error World -> Result Error World
+        actOn instruction world =
+            Result.andThen (perform instruction) world
+    in
+    List.foldl actOn (Ok start) instructions
+
+
+perform : Instruction -> World -> Result Error World
+perform instruction (World world) =
+    Ok <| World { world | robot = interpret instruction world.robot }
+
+
+interpret : Instruction -> Robot -> Robot
+interpret instruction robot =
+    case instruction of
+        Forward ->
+            forward robot
+
+        Left ->
+            left robot
+
+        Right ->
+            right robot
+
+
+type Instruction
+    = Forward
+    | Left
+    | Right
+
+
+type Error
+    = HitAWall
 
 
 type Robot
@@ -86,41 +124,3 @@ toRight direction =
 
         West ->
             North
-
-
-type Instruction
-    = Forward
-    | Left
-    | Right
-
-
-execute : List Instruction -> World -> Result Error World
-execute instructions world =
-    List.foldl perform (Ok world) instructions
-
-
-perform : Instruction -> Result Error World -> Result Error World
-perform instruction world =
-    Result.andThen (act instruction) world
-
-
-act : Instruction -> World -> Result Error World
-act instruction (World world) =
-    Ok <| World { world | robot = interpret instruction world.robot }
-
-
-interpret : Instruction -> Robot -> Robot
-interpret instruction robot =
-    case instruction of
-        Forward ->
-            forward robot
-
-        Left ->
-            left robot
-
-        Right ->
-            right robot
-
-
-type Error
-    = HitAWall
