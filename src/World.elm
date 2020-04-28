@@ -1,15 +1,21 @@
-module World exposing (Direction(..), Error, Instruction(..), Location, Robot, World, executeAll, location, robot, world)
+module World exposing (Direction(..), Element, Error, Instruction(..), Maze, Location, Robot, World, emptyMaze, executeAll, insertElement, location, robot, world)
+
+import Dict exposing (Dict)
 
 
 type World
     = World
         { robot : Robot
+        , maze : Maze
         }
 
 
-world : Robot -> World
-world aRobot =
-    World { robot = aRobot }
+world : Maze -> Robot -> World
+world aMaze aRobot =
+    World
+        { robot = aRobot
+        , maze = aMaze
+        }
 
 
 executeAll : List Instruction -> World -> Result Error World
@@ -80,9 +86,11 @@ right (Robot aRobot) =
 type Location
     = Location { x : Int, y : Int }
 
+
 location : Int -> Int -> Location
 location x y =
     Location { x = x, y = y }
+
 
 advance : Direction -> Location -> Location
 advance direction (Location ({ x, y } as aLocation)) =
@@ -137,3 +145,41 @@ toRight direction =
 
         West ->
             North
+
+
+type Maze
+    = Maze (Dict Int (Dict Int Element))
+
+
+emptyMaze : Maze
+emptyMaze =
+    Maze Dict.empty
+
+
+insertElement : Location -> Element -> Maze -> Maze
+insertElement (Location { x, y }) element (Maze locations) =
+    let
+        insert : Maybe (Dict Int Element) -> Maybe (Dict Int Element)
+        insert dictionary =
+            dictionary
+                |> Maybe.withDefault Dict.empty
+                |> Dict.insert y element
+                |> Just
+    in
+    locations
+        |> Dict.update x insert
+        |> Maze
+
+
+elementAt : Location -> Maze -> Element
+elementAt (Location { x, y }) (Maze dictionary) =
+    dictionary
+        |> Dict.get x
+        |> Maybe.withDefault Dict.empty
+        |> Dict.get y
+        |> Maybe.withDefault Pit
+
+
+type Element
+    = Tile
+    | Pit

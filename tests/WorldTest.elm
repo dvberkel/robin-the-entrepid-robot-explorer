@@ -18,13 +18,13 @@ suite =
                                 expected =
                                     location 0 1
                                         |> robot North
-                                        |> world
+                                        |> world emptyMaze
                                         |> Ok
 
                                 result =
                                     location 0 0
                                         |> robot North
-                                        |> world
+                                        |> world emptyMaze
                                         |> executeAll [ Forward ]
                             in
                             Expect.equal expected result
@@ -34,13 +34,13 @@ suite =
                                 expected =
                                     location 1 0
                                         |> robot East
-                                        |> world
+                                        |> world emptyMaze
                                         |> Ok
 
                                 result =
                                     location 0 0
                                         |> robot East
-                                        |> world
+                                        |> world emptyMaze
                                         |> executeAll [ Forward ]
                             in
                             Expect.equal expected result
@@ -50,13 +50,13 @@ suite =
                                 expected =
                                     location 0 -1
                                         |> robot South
-                                        |> world
+                                        |> world emptyMaze
                                         |> Ok
 
                                 result =
                                     location 0 0
                                         |> robot South
-                                        |> world
+                                        |> world emptyMaze
                                         |> executeAll [ Forward ]
                             in
                             Expect.equal expected result
@@ -66,13 +66,13 @@ suite =
                                 expected =
                                     location -1 0
                                         |> robot West
-                                        |> world
+                                        |> world emptyMaze
                                         |> Ok
 
                                 result =
                                     location 0 0
                                         |> robot West
-                                        |> world
+                                        |> world emptyMaze
                                         |> executeAll [ Forward ]
                             in
                             Expect.equal expected result
@@ -83,13 +83,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot East
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot North
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Right ]
                                 in
                                 Expect.equal expected result
@@ -99,13 +99,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot South
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot East
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Right ]
                                 in
                                 Expect.equal expected result
@@ -115,13 +115,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot West
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot South
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Right ]
                                 in
                                 Expect.equal expected result
@@ -131,13 +131,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot North
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot West
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Right ]
                                 in
                                 Expect.equal expected result
@@ -149,13 +149,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot West
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot North
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Left ]
                                 in
                                 Expect.equal expected result
@@ -165,13 +165,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot North
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot East
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Left ]
                                 in
                                 Expect.equal expected result
@@ -181,13 +181,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot East
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot South
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Left ]
                                 in
                                 Expect.equal expected result
@@ -197,13 +197,13 @@ suite =
                                     expected =
                                         location 0 0
                                             |> robot South
-                                            |> world
+                                            |> world emptyMaze
                                             |> Ok
 
                                     result =
                                         location 0 0
                                             |> robot West
-                                            |> world
+                                            |> world emptyMaze
                                             |> executeAll [ Left ]
                                 in
                                 Expect.equal expected result
@@ -218,13 +218,13 @@ suite =
                         expected =
                             location 0 0
                                 |> robot North
-                                |> world
+                                |> world emptyMaze
                                 |> Ok
 
                         result =
                             location 0 0
                                 |> robot North
-                                |> world
+                                |> world emptyMaze
                                 |> executeAll [ Forward, Left, Forward, Left, Forward, Left, Forward, Left ]
                     in
                     Expect.equal expected result
