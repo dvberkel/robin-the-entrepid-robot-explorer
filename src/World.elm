@@ -1,4 +1,4 @@
-module World exposing (Error, Instruction(..), World, executeAll, world)
+module World exposing (Direction(..), Error, Instruction(..), Location, Robot, World, executeAll, location, robot, world)
 
 
 type World
@@ -8,8 +8,8 @@ type World
 
 
 world : Robot -> World
-world robot =
-    World { robot = robot }
+world aRobot =
+    World { robot = aRobot }
 
 
 executeAll : List Instruction -> World -> Result Error World
@@ -28,16 +28,16 @@ execute instruction (World aWorld) =
 
 
 interpret : Instruction -> Robot -> Robot
-interpret instruction robot =
+interpret instruction aRobot =
     case instruction of
         Forward ->
-            forward robot
+            forward aRobot
 
         Left ->
-            left robot
+            left aRobot
 
         Right ->
-            right robot
+            right aRobot
 
 
 type Instruction
@@ -52,44 +52,52 @@ type Error
 
 type Robot
     = Robot
-        { location : Position
+        { location : Location
         , direction : Direction
         }
 
 
+robot : Direction -> Location -> Robot
+robot direction aLocation =
+    Robot { direction = direction, location = aLocation }
+
+
 forward : Robot -> Robot
-forward (Robot robot) =
-    Robot { robot | location = advance robot.direction robot.location }
+forward (Robot aRobot) =
+    Robot { aRobot | location = advance aRobot.direction aRobot.location }
 
 
 left : Robot -> Robot
-left (Robot robot) =
-    Robot { robot | direction = toLeft robot.direction }
+left (Robot aRobot) =
+    Robot { aRobot | direction = toLeft aRobot.direction }
 
 
 right : Robot -> Robot
-right (Robot robot) =
-    Robot { robot | direction = toRight robot.direction }
+right (Robot aRobot) =
+    Robot { aRobot | direction = toRight aRobot.direction }
 
 
-type Position
-    = Position { x : Int, y : Int }
+type Location
+    = Location { x : Int, y : Int }
 
+location : Int -> Int -> Location
+location x y =
+    Location { x = x, y = y }
 
-advance : Direction -> Position -> Position
-advance direction (Position { x, y }) =
+advance : Direction -> Location -> Location
+advance direction (Location ({ x, y } as aLocation)) =
     case direction of
         North ->
-            Position { x = x, y = y + 1 }
+            Location { aLocation | y = y + 1 }
 
         East ->
-            Position { x = x + 1, y = y }
+            Location { aLocation | x = x + 1 }
 
         South ->
-            Position { x = x, y = y + 1 }
+            Location { aLocation | y = y - 1 }
 
         West ->
-            Position { x = x - 1, y = y }
+            Location { aLocation | x = x - 1 }
 
 
 type Direction
