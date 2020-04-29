@@ -44,6 +44,8 @@ Sensors                   = "operational"
 
 Wow, the surge has wiped almost all highlevel functions. With communications down, there is no way of restoring Robin the entrepid robot explorer back to an operational state. She needs to come back to the lab, so she can be repaired.
 
-Luckily the Motor Driver Processor and Controller Area Network are still operational. This way you can update the motor driver to respond to commands send over the Controller Area Network!   
+Luckily the Motor Driver Processor and Controller Area Network are still operational. This way you can update the motor driver to respond to commands send over the Controller Area Network!
+
+Quick! Patch a connection to CCTV feed and [hack into the robot control](http://localhost:8000/src/ControlRoom.elm).
 
 [elm/parser]: https://package.elm-lang.org/packages/elm/parser/latest/ 
