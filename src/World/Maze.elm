@@ -1,14 +1,14 @@
-module World.Maze exposing (Element(..), Maze, elementAt, emptyMaze, insertElement, insertRectangle)
+module World.Maze exposing (Tile(..), Maze, tileAt, emptyMaze, insertTile, insertRectangle)
 
 import Dict exposing (Dict)
 import World.GPS as GPS exposing (Location)
 
 
 type Maze
-    = Maze (Dict Int (Dict Int Element))
+    = Maze (Dict Int (Dict Int Tile))
 
 
-type Element
+type Tile
     = Floor
     | Pit
     | Wall
@@ -19,7 +19,7 @@ emptyMaze =
     Maze Dict.empty
 
 
-insertRectangle : ( Location, Location ) -> Element -> Maze -> Maze
+insertRectangle : ( Location, Location ) -> Tile -> Maze -> Maze
 insertRectangle ( lowerLeft, upperRight ) element aMaze =
     let
         ( llx, lly ) =
@@ -36,7 +36,7 @@ insertRectangle ( lowerLeft, upperRight ) element aMaze =
     in
     cartesianProduct xs ys
         |> List.map (unpack GPS.location)
-        |> List.foldl (swap insertElement <| element) aMaze
+        |> List.foldl (swap insertTile <| element) aMaze
 
 
 unpack : (a -> b -> c) -> ( a, b ) -> c
@@ -60,17 +60,17 @@ cartesianProduct xs ys =
         |> List.concatMap columnOf
 
 
-insertElement : Location -> Element -> Maze -> Maze
-insertElement location element (Maze locations) =
+insertTile : Location -> Tile -> Maze -> Maze
+insertTile location tile (Maze locations) =
     let
         ( x, y ) =
             GPS.coordinates2D location
 
-        insert : Maybe (Dict Int Element) -> Maybe (Dict Int Element)
+        insert : Maybe (Dict Int Tile) -> Maybe (Dict Int Tile)
         insert dictionary =
             dictionary
                 |> Maybe.withDefault Dict.empty
-                |> Dict.insert y element
+                |> Dict.insert y tile
                 |> Just
     in
     locations
@@ -78,8 +78,8 @@ insertElement location element (Maze locations) =
         |> Maze
 
 
-elementAt : Location -> Maze -> Element
-elementAt location (Maze dictionary) =
+tileAt : Location -> Maze -> Tile
+tileAt location (Maze dictionary) =
     let
         ( x, y ) =
             GPS.coordinates2D location

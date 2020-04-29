@@ -1,7 +1,7 @@
 module World exposing (Error(..), World, executeAll, world)
 
 import World.GPS exposing (Location)
-import World.Maze as Maze exposing (Element(..), Maze, elementAt)
+import World.Maze as Maze exposing (Tile(..), Maze, tileAt)
 import World.Robot as Robot exposing (Instruction, Robot)
 
 
@@ -45,7 +45,7 @@ execute ( instructionPointer, instruction ) (World aWorld) =
             Robot.location intention
 
         targetTile =
-            elementAt targetLocation aWorld.maze
+            tileAt targetLocation aWorld.maze
     in
     case targetTile of
         Floor ->

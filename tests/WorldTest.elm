@@ -4,7 +4,7 @@ import Expect
 import Test exposing (Test, describe, test)
 import World exposing (Error(..), executeAll, world)
 import World.GPS exposing (Direction(..), location)
-import World.Maze exposing (Element(..), emptyMaze, insertElement, insertRectangle)
+import World.Maze exposing (Tile(..), emptyMaze, insertTile, insertRectangle)
 import World.Robot exposing (Instruction(..), robot)
 
 
@@ -44,7 +44,7 @@ suite =
 
                         maze =
                             emptyMaze
-                                |> insertElement (location 0 0) Floor
+                                |> insertTile (location 0 0) Floor
 
                         result =
                             location 0 0
@@ -62,8 +62,8 @@ suite =
 
                         maze =
                             emptyMaze
-                                |> insertElement (location 0 0) Floor
-                                |> insertElement (location 0 1) Wall
+                                |> insertTile (location 0 0) Floor
+                                |> insertTile (location 0 1) Wall
 
                         result =
                             location 0 0
