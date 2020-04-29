@@ -1,4 +1,4 @@
-module World exposing (Direction(..), Element, Error, Instruction(..), Maze, Location, Robot, World, emptyMaze, executeAll, insertElement, location, robot, world)
+module World exposing (Direction(..), Element(..), Error, Instruction(..), Location, Maze, Robot, World, emptyMaze, executeAll, insertElement, insertRectangle, location, robot, world)
 
 import Dict exposing (Dict)
 
@@ -54,6 +54,7 @@ type Instruction
 
 type Error
     = HitAWall
+    | FellInAPit
 
 
 type Robot
@@ -156,6 +157,41 @@ emptyMaze =
     Maze Dict.empty
 
 
+insertRectangle : ( Location, Location ) -> Element -> Maze -> Maze
+insertRectangle ( Location lowerLeft, Location upperRight ) element aMaze =
+    let
+        xs =
+            List.range lowerLeft.x upperRight.x
+
+        ys =
+            List.range lowerLeft.y upperRight.y
+    in
+    cartesianProduct xs ys
+        |> List.map (unpack location)
+        |> List.foldl (swap insertElement <| element) aMaze
+
+
+unpack : (a -> b -> c) -> ( a, b ) -> c
+unpack f ( a, b ) =
+    f a b
+
+
+swap : (a -> b -> c) -> b -> a -> c
+swap f b a =
+    f a b
+
+
+cartesianProduct : List a -> List b -> List ( a, b )
+cartesianProduct xs ys =
+    let
+        columnOf x =
+            ys
+                |> List.map (\y -> ( x, y ))
+    in
+    xs
+        |> List.concatMap columnOf
+
+
 insertElement : Location -> Element -> Maze -> Maze
 insertElement (Location { x, y }) element (Maze locations) =
     let
@@ -183,3 +219,4 @@ elementAt (Location { x, y }) (Maze dictionary) =
 type Element
     = Tile
     | Pit
+    | Wall
