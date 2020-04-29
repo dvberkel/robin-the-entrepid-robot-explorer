@@ -31,7 +31,7 @@ executeAll instructions start =
 
 execute : Instruction -> World -> Result Error World
 execute instruction (World aWorld) =
-    Ok <| World { aWorld | robot = Robot.interpret instruction aWorld.robot }
+    Ok <| World { aWorld | robot = Robot.execute instruction aWorld.robot }
 
 
 type Error

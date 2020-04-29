@@ -1,4 +1,4 @@
-module World.Robot exposing (Instruction(..), Robot, interpret, robot)
+module World.Robot exposing (Instruction(..), Robot, execute, robot)
 
 import World.GPS exposing (Direction, Location, advance, toLeft, toRight)
 
@@ -15,8 +15,8 @@ robot direction aLocation =
     Robot { direction = direction, location = aLocation }
 
 
-interpret : Instruction -> Robot -> Robot
-interpret instruction aRobot =
+execute : Instruction -> Robot -> Robot
+execute instruction aRobot =
     case instruction of
         Forward ->
             forward aRobot

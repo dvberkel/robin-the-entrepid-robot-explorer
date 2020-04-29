@@ -3,7 +3,7 @@ module RobotTest exposing (suite)
 import Expect
 import Test exposing (Test, describe, test)
 import World.GPS exposing (Direction(..), location)
-import World.Robot exposing (Instruction(..), interpret, robot)
+import World.Robot exposing (Instruction(..), execute, robot)
 
 
 suite : Test
@@ -21,7 +21,7 @@ suite =
                             result =
                                 location 0 0
                                     |> robot North
-                                    |> interpret Forward
+                                    |> execute Forward
                         in
                         Expect.equal expected result
                 , test "facing East" <|
@@ -34,7 +34,7 @@ suite =
                             result =
                                 location 0 0
                                     |> robot East
-                                    |> interpret Forward
+                                    |> execute Forward
                         in
                         Expect.equal expected result
                 , test "facing South" <|
@@ -47,7 +47,7 @@ suite =
                             result =
                                 location 0 0
                                     |> robot South
-                                    |> interpret Forward
+                                    |> execute Forward
                         in
                         Expect.equal expected result
                 , test "facing West" <|
@@ -60,7 +60,7 @@ suite =
                             result =
                                 location 0 0
                                     |> robot West
-                                    |> interpret Forward
+                                    |> execute Forward
                         in
                         Expect.equal expected result
                 , describe "right"
@@ -74,7 +74,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot North
-                                        |> interpret Right
+                                        |> execute Right
                             in
                             Expect.equal expected result
                     , test "facing East" <|
@@ -87,7 +87,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot East
-                                        |> interpret Right
+                                        |> execute Right
                             in
                             Expect.equal expected result
                     , test "facing South" <|
@@ -100,7 +100,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot South
-                                        |> interpret Right
+                                        |> execute Right
                             in
                             Expect.equal expected result
                     , test "facing West" <|
@@ -113,7 +113,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot West
-                                        |> interpret Right
+                                        |> execute Right
                             in
                             Expect.equal expected result
                     ]
@@ -128,7 +128,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot North
-                                        |> interpret Left
+                                        |> execute Left
                             in
                             Expect.equal expected result
                     , test "facing East" <|
@@ -141,7 +141,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot East
-                                        |> interpret Left
+                                        |> execute Left
                             in
                             Expect.equal expected result
                     , test "facing South" <|
@@ -154,7 +154,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot South
-                                        |> interpret Left
+                                        |> execute Left
                             in
                             Expect.equal expected result
                     , test "facing West" <|
@@ -167,7 +167,7 @@ suite =
                                 result =
                                     location 0 0
                                         |> robot West
-                                        |> interpret Left
+                                        |> execute Left
                             in
                             Expect.equal expected result
                     ]
