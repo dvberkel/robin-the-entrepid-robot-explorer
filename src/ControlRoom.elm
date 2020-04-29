@@ -18,18 +18,27 @@ main =
 init : Int -> () -> ( Model, Cmd Msg )
 init level _ =
     let
+        handler response =
+            case response of
+                Ok string ->
+                    ReceivedLevel level
+
+                Err error ->
+                    LoadError error
+
         loadCommand =
             Http.get
                 { url = "levels/" ++ levelName level ++ ".json"
-                , expect = Http.expectString (\_ -> ReceivedLevel level)
+                , expect = Http.expectString handler
                 }
     in
-    ( Loading 0, loadCommand )
+    ( Loading level, loadCommand )
 
 
 type Model
     = Loading Int
     | Loaded Level
+    | Failure Http.Error
 
 
 type alias Level =
@@ -47,6 +56,9 @@ view model =
 
                 Loaded level ->
                     controlLevel level
+
+                Failure _ ->
+                    connectionFailure
     in
     { title = "Control Room"
     , body = body
@@ -77,8 +89,14 @@ levelName level =
     prefix ++ String.fromInt level
 
 
+connectionFailure : List (Html Msg)
+connectionFailure =
+    [ Html.h1 [] [ Html.text <| "electric interference prevents stable CCTV patch" ] ]
+
+
 type Msg
     = ReceivedLevel Int
+    | LoadError Http.Error
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,6 +104,9 @@ update message model =
     case message of
         ReceivedLevel level ->
             ( Loaded { level = level }, Cmd.none )
+
+        LoadError error ->
+            ( Failure error, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
