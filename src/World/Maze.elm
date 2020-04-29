@@ -8,6 +8,12 @@ type Maze
     = Maze (Dict Int (Dict Int Element))
 
 
+type Element
+    = Floor
+    | Pit
+    | Wall
+
+
 emptyMaze : Maze
 emptyMaze =
     Maze Dict.empty
@@ -83,9 +89,3 @@ elementAt location (Maze dictionary) =
         |> Maybe.withDefault Dict.empty
         |> Dict.get y
         |> Maybe.withDefault Pit
-
-
-type Element
-    = Tile
-    | Pit
-    | Wall

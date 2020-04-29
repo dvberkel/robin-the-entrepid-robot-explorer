@@ -1,4 +1,4 @@
-module World.Robot exposing (Instruction(..), Robot, execute, robot)
+module World.Robot exposing (Instruction(..), Robot, execute, location, robot)
 
 import World.GPS exposing (Direction, Location, advance, toLeft, toRight)
 
@@ -47,3 +47,8 @@ left (Robot aRobot) =
 right : Robot -> Robot
 right (Robot aRobot) =
     Robot { aRobot | direction = toRight aRobot.direction }
+
+
+location : Robot -> Location
+location (Robot aRobot) =
+    aRobot.location

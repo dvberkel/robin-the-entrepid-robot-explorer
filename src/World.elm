@@ -1,6 +1,7 @@
-module World exposing (Error, World, executeAll, world)
+module World exposing (Error(..), World, executeAll, world)
 
-import World.Maze as Maze exposing (Maze, elementAt)
+import World.GPS exposing (Location)
+import World.Maze as Maze exposing (Element(..), Maze, elementAt)
 import World.Robot as Robot exposing (Instruction, Robot)
 
 
@@ -23,22 +24,40 @@ executeAll : List Instruction -> World -> Result Error World
 executeAll instructions start =
     let
         enumerate index instruction =
-            (index, instruction)
+            ( index, instruction )
 
-        actOn : (Int, Instruction) -> Result Error World -> Result Error World
+        actOn : ( Int, Instruction ) -> Result Error World -> Result Error World
         actOn instruction aWorld =
             Result.andThen (execute instruction) aWorld
     in
     instructions
-    |> List.indexedMap enumerate
-    |> List.foldl actOn (Ok start)
+        |> List.indexedMap enumerate
+        |> List.foldl actOn (Ok start)
 
 
-execute : (Int, Instruction) -> World -> Result Error World
-execute (_, instruction) (World aWorld) =
-    Ok <| World { aWorld | robot = Robot.execute instruction aWorld.robot }
+execute : ( Int, Instruction ) -> World -> Result Error World
+execute ( instructionPointer, instruction ) (World aWorld) =
+    let
+        intention =
+            Robot.execute instruction aWorld.robot
+
+        targetLocation =
+            Robot.location intention
+
+        targetTile =
+            elementAt targetLocation aWorld.maze
+    in
+    case targetTile of
+        Floor ->
+            Ok <| World { aWorld | robot = intention }
+
+        Wall ->
+            Err <| HitAWall instructionPointer targetLocation
+
+        Pit ->
+            Err <| FellInAPit instructionPointer targetLocation
 
 
 type Error
-    = HitAWall
-    | FellInAPit
+    = HitAWall Int Location
+    | FellInAPit Int Location
