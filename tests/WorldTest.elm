@@ -4,6 +4,9 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import World exposing (..)
+import World.GPS exposing (..)
+import World.Maze exposing (..)
+import World.Robot exposing (..)
 
 
 suite : Test
@@ -11,7 +14,7 @@ suite =
     let
         defaultMaze =
             emptyMaze
-            |> insertRectangle (location -2 -2, location 2 2) Tile
+                |> insertRectangle ( location -2 -2, location 2 2 ) Tile
     in
     describe "World"
         [ describe "executing instructions"
