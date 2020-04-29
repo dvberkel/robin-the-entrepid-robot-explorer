@@ -30,15 +30,15 @@ You frantically type in some commands and a status report is shown on screen.
 
 ```toml
 [status]
-Artificial Intelligence   = "down"
-Route Planner             = "down"
-Global Positioning System = "down"
+Artificial_Intelligence   = "down"
+Route_Planner             = "down"
+Global_Positioning_System = "down"
 Communications            = "down"
-Core Memory               = "down"
-Central Processing Unit   = "down"
-Motor Driver Processor    = "operational"
-Controller Area Network   = "operational"
-Motor Control             = "operational"
+Core_Memory               = "down"
+Central_Processing_Unit   = "down"
+Motor_Driver_Processor    = "operational"
+Controller_Area_Network   = "operational"
+Motor_Control             = "operational"
 Sensors                   = "operational"
 ```
 
@@ -46,6 +46,6 @@ Wow, the surge has wiped almost all highlevel functions. With communications dow
 
 Luckily the Motor Driver Processor and Controller Area Network are still operational. This way you can update the motor driver to respond to commands send over the Controller Area Network!
 
-Quick! Patch a connection to CCTV feed and [hack into the robot control](http://localhost:8000/src/ControlRoom.elm).
+Quick! Patch a connection to CCTV feed and [hack into the Controller Area Network](http://localhost:8000/src/ControlRoom.elm).
 
 [elm/parser]: https://package.elm-lang.org/packages/elm/parser/latest/ 
