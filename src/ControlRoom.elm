@@ -16,18 +16,44 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {}, Cmd.none )
+    ( Loaded { level = 0 }, Cmd.none )
 
 
-type alias Model =
-    {}
+type Model
+    = Loading Int
+    | Loaded Level
+
+
+type alias Level =
+    { level : Int
+    }
 
 
 view : Model -> Browser.Document Msg
-view _ =
+view model =
+    let
+        body =
+            case model of
+                Loading level ->
+                    connectingToLevel level
+
+                Loaded level ->
+                    controlLevel level
+    in
     { title = "Control Room"
-    , body = [ Html.text "Hello, World!" ]
+    , body = body
     }
+
+
+connectingToLevel : Int -> List (Html Msg)
+connectingToLevel index =
+    [ Html.h1 [] [ Html.text "patching into CCTV stream" ] ]
+
+
+controlLevel : Level -> List (Html Msg)
+controlLevel { level } =
+    [ Html.h1 [] [ Html.text <| "Level " ++ String.fromInt level ]
+    ]
 
 
 type Msg
