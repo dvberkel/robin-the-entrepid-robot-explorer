@@ -22,15 +22,20 @@ world aMaze aRobot =
 executeAll : List Instruction -> World -> Result Error World
 executeAll instructions start =
     let
-        actOn : Instruction -> Result Error World -> Result Error World
+        enumerate index instruction =
+            (index, instruction)
+
+        actOn : (Int, Instruction) -> Result Error World -> Result Error World
         actOn instruction aWorld =
             Result.andThen (execute instruction) aWorld
     in
-    List.foldl actOn (Ok start) instructions
+    instructions
+    |> List.indexedMap enumerate
+    |> List.foldl actOn (Ok start)
 
 
-execute : Instruction -> World -> Result Error World
-execute instruction (World aWorld) =
+execute : (Int, Instruction) -> World -> Result Error World
+execute (_, instruction) (World aWorld) =
     Ok <| World { aWorld | robot = Robot.execute instruction aWorld.robot }
 
 
