@@ -2,21 +2,29 @@ module ControlRoom exposing (..)
 
 import Browser
 import Html exposing (Html)
+import Http
 
 
 main : Program () Model Msg
 main =
     Browser.document
-        { init = init
+        { init = init 0
         , view = view
         , update = update
         , subscriptions = subscriptions
         }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Loaded { level = 0 }, Cmd.none )
+init : Int -> () -> ( Model, Cmd Msg )
+init level _ =
+    let
+        loadCommand =
+            Http.get
+                { url = "levels/" ++ levelName level ++ ".json"
+                , expect = Http.expectString (\_ -> ReceivedLevel level)
+                }
+    in
+    ( Loading 0, loadCommand )
 
 
 type Model
@@ -52,17 +60,32 @@ connectingToLevel index =
 
 controlLevel : Level -> List (Html Msg)
 controlLevel { level } =
-    [ Html.h1 [] [ Html.text <| "Level " ++ String.fromInt level ]
+    [ Html.h1 [] [ Html.text <| "Level " ++ levelName level ]
     ]
 
 
+levelName : Int -> String
+levelName level =
+    let
+        prefix =
+            if level < 10 then
+                "0"
+
+            else
+                ""
+    in
+    prefix ++ String.fromInt level
+
+
 type Msg
-    = DoNothing
+    = ReceivedLevel Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update _ model =
-    ( model, Cmd.none )
+update message model =
+    case message of
+        ReceivedLevel level ->
+            ( Loaded { level = level }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
