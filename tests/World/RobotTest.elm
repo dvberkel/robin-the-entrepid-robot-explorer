@@ -1,4 +1,4 @@
-module RobotTest exposing (suite)
+module World.RobotTest exposing (suite)
 
 import Expect
 import Test exposing (Test, describe, test)
