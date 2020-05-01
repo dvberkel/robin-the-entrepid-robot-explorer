@@ -1,9 +1,11 @@
 module World.RobotTest exposing (suite)
 
 import Expect
-import Test exposing (Test, describe, test)
-import World.GPS exposing (Direction(..), location)
-import World.Robot exposing (Instruction(..), execute, robot)
+import Fuzz exposing (Fuzzer, constant, int, oneOf)
+import Json.Decode as Decode
+import Test exposing (Test, describe, fuzz, test)
+import World.GPS exposing (Direction(..), Location, location)
+import World.Robot as Robot exposing (Instruction(..), Robot, execute, robot)
 
 
 suite : Test
@@ -173,4 +175,52 @@ suite =
                     ]
                 ]
             ]
+        , describe "decode"
+            [ test "decode a robot" <|
+                \_ ->
+                    let
+                        expected =
+                            location 0 0
+                                |> robot North
+                                |> Ok
+
+                        actual =
+                            """{"location": {"x": 0, "y": 0}, "direction": "North"}"""
+                                |> Decode.decodeString Robot.decode
+                    in
+                    Expect.equal expected actual
+            , fuzz robotFuzzer "encode decode are inverses" <|
+                \aRobot ->
+                    let
+                        expected =
+                            aRobot
+                                |> Ok
+
+                        actual =
+                            aRobot
+                                |> Robot.encode
+                                |> Decode.decodeValue Robot.decode
+                    in
+                    Expect.equal expected actual
+            ]
+        ]
+
+
+robotFuzzer : Fuzzer Robot
+robotFuzzer =
+    Fuzz.map2 robot directionFuzzer locationFuzzer
+
+
+locationFuzzer : Fuzzer Location
+locationFuzzer =
+    Fuzz.map2 location int int
+
+
+directionFuzzer : Fuzzer Direction
+directionFuzzer =
+    oneOf
+        [ constant North
+        , constant East
+        , constant South
+        , constant West
         ]

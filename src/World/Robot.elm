@@ -1,6 +1,9 @@
-module World.Robot exposing (Instruction(..), Robot, execute, location, robot)
+module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot)
 
-import World.GPS exposing (Direction, Location, advance, toLeft, toRight)
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as Encode
+import World.GPS as GPS exposing (Direction, Location, advance, toLeft, toRight)
 
 
 type Robot
@@ -52,3 +55,18 @@ right (Robot aRobot) =
 location : Robot -> Location
 location (Robot aRobot) =
     aRobot.location
+
+
+encode : Robot -> Encode.Value
+encode (Robot aRobot) =
+    Encode.object
+        [ ( "location", GPS.encodeLocation aRobot.location )
+        , ( "direction", GPS.encodeDirection aRobot.direction )
+        ]
+
+
+decode : Decoder Robot
+decode =
+    Decode.succeed robot
+        |> required "direction" GPS.decodeDirection
+        |> required "location" GPS.decodeLocation
