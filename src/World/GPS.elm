@@ -1,4 +1,8 @@
-module World.GPS exposing (Direction(..), Location, advance, coordinates2D, location, toLeft, toRight)
+module World.GPS exposing (Direction(..), Location, advance, coordinates2D, decodeLocation, encodeLocation, location, toLeft, toRight)
+
+import Json.Decode as Decode exposing (Decoder, int)
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as Encode
 
 
 type Location
@@ -13,6 +17,21 @@ location x y =
 coordinates2D : Location -> ( Int, Int )
 coordinates2D (Location { x, y }) =
     ( x, y )
+
+
+decodeLocation : Decoder Location
+decodeLocation =
+    Decode.succeed location
+        |> required "x" Decode.int
+        |> required "y" Decode.int
+
+
+encodeLocation : Location -> Encode.Value
+encodeLocation (Location { x, y }) =
+    Encode.object
+        [ ( "x", Encode.int x )
+        , ( "y", Encode.int y )
+        ]
 
 
 type Direction
