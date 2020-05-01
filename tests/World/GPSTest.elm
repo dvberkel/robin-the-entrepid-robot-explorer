@@ -1,10 +1,10 @@
-module World.GPSTest exposing (suite)
+module World.GPSTest exposing (directionFuzzer, locationFuzzer, suite)
 
 import Expect
-import Fuzz exposing (int)
+import Fuzz exposing (Fuzzer, constant, int, oneOf)
 import Json.Decode as Decode
-import Test exposing (Test, describe, fuzz, fuzz2, test)
-import World.GPS as GPS exposing (Direction(..), location)
+import Test exposing (Test, describe, fuzz, test)
+import World.GPS as GPS exposing (Direction(..), Location, location)
 
 
 suite : Test
@@ -23,12 +23,9 @@ suite =
                                 |> Decode.decodeString GPS.decodeLocation
                     in
                     Expect.equal expected actual
-            , fuzz2 int int "encode decode of location should be inverses" <|
-                \x y ->
+            , fuzz locationFuzzer "encode decode of location should be inverses" <|
+                \aLocation ->
                     let
-                        aLocation =
-                            location x y
-
                         expected =
                             aLocation
                                 |> Ok
@@ -53,7 +50,7 @@ suite =
                                 |> Decode.decodeString (Decode.field "direction" GPS.decodeDirection)
                     in
                     Expect.equal expected actual
-            , fuzz (Fuzz.oneOf [ Fuzz.constant North, Fuzz.constant East, Fuzz.constant South, Fuzz.constant West ]) "encode decode of direction should be inverses" <|
+            , fuzz directionFuzzer "encode decode of direction should be inverses" <|
                 \aDirection ->
                     let
                         expected =
@@ -67,4 +64,19 @@ suite =
                     in
                     Expect.equal expected actual
             ]
+        ]
+
+
+locationFuzzer : Fuzzer Location
+locationFuzzer =
+    Fuzz.map2 location int int
+
+
+directionFuzzer : Fuzzer Direction
+directionFuzzer =
+    oneOf
+        [ constant North
+        , constant East
+        , constant South
+        , constant West
         ]

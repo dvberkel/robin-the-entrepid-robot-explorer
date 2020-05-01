@@ -1,10 +1,11 @@
-module World.RobotTest exposing (suite)
+module World.RobotTest exposing (robotFuzzer, suite)
 
 import Expect
-import Fuzz exposing (Fuzzer, constant, int, oneOf)
+import Fuzz exposing (Fuzzer)
 import Json.Decode as Decode
 import Test exposing (Test, describe, fuzz, test)
-import World.GPS exposing (Direction(..), Location, location)
+import World.GPS exposing (Direction(..), location)
+import World.GPSTest exposing (directionFuzzer, locationFuzzer)
 import World.Robot as Robot exposing (Instruction(..), Robot, execute, robot)
 
 
@@ -209,18 +210,3 @@ suite =
 robotFuzzer : Fuzzer Robot
 robotFuzzer =
     Fuzz.map2 robot directionFuzzer locationFuzzer
-
-
-locationFuzzer : Fuzzer Location
-locationFuzzer =
-    Fuzz.map2 location int int
-
-
-directionFuzzer : Fuzzer Direction
-directionFuzzer =
-    oneOf
-        [ constant North
-        , constant East
-        , constant South
-        , constant West
-        ]
