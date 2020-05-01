@@ -1,7 +1,7 @@
-module World.GPS exposing (Direction(..), Location, advance, coordinates2D, decodeLocation, encodeLocation, location, toLeft, toRight)
+module World.GPS exposing (Direction(..), Location, advance, coordinates2D, decodeDirection, decodeLocation, encodeDirection, encodeLocation, location, toLeft, toRight)
 
 import Json.Decode as Decode exposing (Decoder, int)
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (required, resolve)
 import Json.Encode as Encode
 
 
@@ -87,3 +87,47 @@ advance direction (Location ({ x, y } as aLocation)) =
 
         West ->
             Location { aLocation | x = x - 1 }
+
+
+decodeDirection : Decoder Direction
+decodeDirection =
+    let
+        toDirection input =
+            case input of
+                "North" ->
+                    Decode.succeed North
+
+                "East" ->
+                    Decode.succeed East
+
+                "South" ->
+                    Decode.succeed South
+
+                "West" ->
+                    Decode.succeed West
+
+                _ ->
+                    Decode.fail <| "'" ++ input ++ "' is not a direction"
+    in
+    Decode.string
+        |> Decode.andThen toDirection
+
+
+encodeDirection : Direction -> Encode.Value
+encodeDirection direction =
+    let
+        value =
+            case direction of
+                North ->
+                    "North"
+
+                East ->
+                    "East"
+
+                South ->
+                    "South"
+
+                West ->
+                    "West"
+    in
+    Encode.string value
