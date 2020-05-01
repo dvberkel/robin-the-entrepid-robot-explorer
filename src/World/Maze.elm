@@ -1,7 +1,10 @@
-module World.Maze exposing (Tile(..), Maze, tileAt, emptyMaze, insertTile, insertRectangle)
+module World.Maze exposing (Maze, Tile(..), decode, emptyMaze, encode, insertRectangle, insertTile, tileAt)
 
 import Dict exposing (Dict)
-import World.GPS as GPS exposing (Location)
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (hardcoded)
+import Json.Encode as Encode
+import World.GPS as GPS exposing (Location, location)
 
 
 type Maze
@@ -89,3 +92,156 @@ tileAt location (Maze dictionary) =
         |> Maybe.withDefault Dict.empty
         |> Dict.get y
         |> Maybe.withDefault Pit
+
+
+encode : Maze -> Encode.Value
+encode (Maze dictionary) =
+    let
+        toYTiles : Int -> Dict Int Tile -> List ( Int, Tile )
+        toYTiles _ =
+            Dict.toList
+
+        toXYTiles : ( Int, List ( Int, Tile ) ) -> List ( ( Int, Int ), Tile )
+        toXYTiles ( x, ys ) =
+            List.map (\( y, tile ) -> ( ( x, y ), tile )) ys
+
+        toObjectPairs ( ( x, y ), tile ) =
+            ( String.join "," <| List.map String.fromInt [ x, y ], encodeTile tile )
+    in
+    dictionary
+        |> Dict.map toYTiles
+        |> Dict.toList
+        |> List.concatMap toXYTiles
+        |> List.map toObjectPairs
+        |> Encode.object
+
+
+encodeTile : Tile -> Encode.Value
+encodeTile tile =
+    let
+        value =
+            case tile of
+                Floor ->
+                    "Floor"
+
+                Pit ->
+                    "Pit"
+
+                Wall ->
+                    "Wall"
+    in
+    Encode.string value
+
+
+decode : Decoder Maze
+decode =
+    let
+        parse ( input, tile ) =
+            input
+                |> parseLocation
+                |> Result.map (\aLocation -> ( aLocation, tile ))
+
+        insert ( aLocation, aTile ) aMaze =
+            insertTile aLocation aTile aMaze
+
+        toMaze xs =
+            xs
+                |> List.foldl insert emptyMaze
+    in
+    Decode.keyValuePairs decodeTile
+        |> parseMap (\( input, _ ) -> input) parse
+        |> Decode.map toMaze
+
+
+parseMap : (a -> String) -> (a -> Result e b) -> Decoder (List a) -> Decoder (List b)
+parseMap toString parse xss =
+    let
+        decoder xs =
+            case xs of
+                [] ->
+                    Decode.succeed []
+
+                ( index, h ) :: tail ->
+                    case parse h of
+                        Ok y ->
+                            decoder tail
+                                |> Decode.map (\ys -> ( index, y ) :: ys)
+
+                        Err _ ->
+                            Decode.fail <| "could not parse element '" ++ toString h ++ "' at index: " ++ String.fromInt index
+    in
+    xss
+        |> Decode.map enumerate
+        |> Decode.andThen decoder
+        |> Decode.map denumerate
+
+
+enumerate : List a -> List ( Int, a )
+enumerate =
+    indexedEnumerate 0 []
+
+
+denumerate : List ( Int, a ) -> List a
+denumerate =
+    tailRecursiveDenumerate []
+
+
+tailRecursiveDenumerate : List a -> List ( Int, a ) -> List a
+tailRecursiveDenumerate accumulator xs =
+    case xs of
+        [] ->
+            List.reverse accumulator
+
+        ( _, h ) :: tail ->
+            tailRecursiveDenumerate (h :: accumulator) tail
+
+
+indexedEnumerate : Int -> List ( Int, a ) -> List a -> List ( Int, a )
+indexedEnumerate index accumulator xs =
+    case xs of
+        [] ->
+            List.reverse accumulator
+
+        h :: tail ->
+            indexedEnumerate (index + 1) (( index, h ) :: accumulator) tail
+
+
+decodeTile : Decoder Tile
+decodeTile =
+    let
+        toTile input =
+            case input of
+                "Floor" ->
+                    Decode.succeed Floor
+
+                "Pit" ->
+                    Decode.succeed Pit
+
+                "Wall" ->
+                    Decode.succeed Wall
+
+                _ ->
+                    Decode.fail <| "'" ++ input ++ "' is not a tile"
+    in
+    Decode.string
+        |> Decode.andThen toTile
+
+
+parseLocation : String -> Result LocationParseError Location
+parseLocation input =
+    let
+        coordinates =
+            input
+                |> String.split ","
+                |> List.map String.toInt
+    in
+    case coordinates of
+        [ Just x, Just y ] ->
+            Ok <| location x y
+
+        _ ->
+            Err <| NotALocation input
+
+
+type LocationParseError
+    = NotALocation String
