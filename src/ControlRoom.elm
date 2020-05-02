@@ -1,15 +1,13 @@
 module ControlRoom exposing (Level, decode, encode, level)
 
 import Browser
+import Debug
 import Html exposing (Html)
-import Http
+import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import World exposing (World, world)
-import World.GPS exposing (Direction(..), location)
-import World.Maze exposing (emptyMaze)
-import World.Robot exposing (robot)
+import World exposing (World)
 
 
 main : Program () Model Msg
@@ -27,16 +25,21 @@ init levelIndex _ =
     let
         handler response =
             case response of
-                Ok string ->
-                    ReceivedLevel levelIndex
+                Ok aLevel ->
+                    ReceivedLevel aLevel
 
                 Err error ->
-                    LoadError error
+                    case error of
+                        BadBody reason ->
+                            LoadError <| Parse reason
+
+                        _ ->
+                            LoadError <| Fetch error
 
         loadCommand =
             Http.get
                 { url = "levels/" ++ levelName levelIndex ++ ".json"
-                , expect = Http.expectString handler
+                , expect = Http.expectJson handler decode
                 }
     in
     ( Loading levelIndex, loadCommand )
@@ -45,7 +48,12 @@ init levelIndex _ =
 type Model
     = Loading Int
     | Loaded Level
-    | Failure Http.Error
+    | Failure Problem
+
+
+type Problem
+    = Fetch Http.Error
+    | Parse String
 
 
 type alias Level =
@@ -87,8 +95,8 @@ view model =
                 Loaded levelIndex ->
                     controlLevel levelIndex
 
-                Failure _ ->
-                    connectionFailure
+                Failure problem ->
+                    connectionFailure problem
     in
     { title = "Control Room"
     , body = body
@@ -96,7 +104,7 @@ view model =
 
 
 connectingToLevel : Int -> List (Html Msg)
-connectingToLevel index =
+connectingToLevel _ =
     [ Html.h1 [] [ Html.text "patching into CCTV stream" ] ]
 
 
@@ -119,34 +127,26 @@ levelName index =
     prefix ++ String.fromInt index
 
 
-connectionFailure : List (Html Msg)
-connectionFailure =
-    [ Html.h1 [] [ Html.text <| "electric interference prevents stable CCTV patch" ] ]
+connectionFailure : Problem -> List (Html Msg)
+connectionFailure problem =
+    [ Html.h1 [] [ Html.text <| "electric interference prevents stable CCTV patch"]
+    , Html.p [] [ Html.text <| Debug.toString problem ]
+    ]
 
 
 type Msg
-    = ReceivedLevel Int
-    | LoadError Http.Error
+    = ReceivedLevel Level
+    | LoadError Problem
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update message _ =
     case message of
-        ReceivedLevel json ->
-            let
-                aRobot =
-                    robot North (location 0 0)
-
-                aWorld =
-                    world emptyMaze aRobot
-
-                aLevel =
-                    level 0 aWorld
-            in
+        ReceivedLevel aLevel ->
             ( Loaded aLevel, Cmd.none )
 
-        LoadError error ->
-            ( Failure error, Cmd.none )
+        LoadError problem ->
+            ( Failure problem, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
