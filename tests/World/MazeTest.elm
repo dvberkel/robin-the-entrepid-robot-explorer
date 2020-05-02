@@ -1,4 +1,4 @@
-module World.MazeTest exposing (suite)
+module World.MazeTest exposing (suite, mazeFuzzer)
 
 import Expect
 import Fuzz exposing (Fuzzer, constant, list, oneOf)

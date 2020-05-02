@@ -1,11 +1,15 @@
-module WorldTest exposing (suite)
+module WorldTest exposing (suite, worldFuzzer)
 
 import Expect
-import Test exposing (Test, describe, test)
-import World exposing (Error(..), executeAll, world)
+import Fuzz exposing (Fuzzer)
+import Json.Decode as Decode
+import Test exposing (Test, describe, fuzz, test)
+import World exposing (Error(..), World, executeAll, world)
 import World.GPS exposing (Direction(..), location)
-import World.Maze exposing (Tile(..), emptyMaze, insertTile, insertRectangle)
+import World.Maze exposing (Tile(..), emptyMaze, insertRectangle, insertTile)
+import World.MazeTest exposing (mazeFuzzer)
 import World.Robot exposing (Instruction(..), robot)
+import World.RobotTest exposing (robotFuzzer)
 
 
 suite : Test
@@ -73,4 +77,45 @@ suite =
                     in
                     Expect.equal expected result
             ]
+        , describe "decode"
+            [ test "of a maze" <|
+                \_ ->
+                    let
+                        aRobot =
+                            location 0 0
+                                |> robot North
+
+                        aMaze =
+                            emptyMaze
+                                |> insertTile (location 0 0) Floor
+                                |> insertTile (location 0 1) Wall
+
+                        expected =
+                            world aMaze aRobot
+                                |> Ok
+
+                        actual =
+                            """{"robot": {"location": {"x": 0, "y": 0}, "direction": "North"}, "maze": {"0,0": "Floor", "0,1": "Wall"}}"""
+                                |> Decode.decodeString World.decode
+                    in
+                    Expect.equal expected actual
+            , fuzz worldFuzzer "encode decode are inversus" <|
+                \aWorld ->
+                    let
+                        expected =
+                            aWorld
+                                |> Ok
+
+                        actual =
+                            aWorld
+                                |> World.encode
+                                |> Decode.decodeValue World.decode
+                    in
+                    Expect.equal expected actual
+            ]
         ]
+
+
+worldFuzzer : Fuzzer World
+worldFuzzer =
+    Fuzz.map2 world mazeFuzzer robotFuzzer

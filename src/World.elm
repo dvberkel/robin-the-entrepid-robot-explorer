@@ -1,7 +1,10 @@
-module World exposing (Error(..), World, executeAll, world)
+module World exposing (Error(..), World, decode, encode, executeAll, world)
 
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as Encode
 import World.GPS exposing (Location)
-import World.Maze exposing (Tile(..), Maze, tileAt)
+import World.Maze as Maze exposing (Maze, Tile(..), tileAt)
 import World.Robot as Robot exposing (Instruction, Robot)
 
 
@@ -61,3 +64,18 @@ execute ( instructionPointer, instruction ) (World aWorld) =
 type Error
     = HitAWall Int Location
     | FellInAPit Int Location
+
+
+encode : World -> Encode.Value
+encode (World aWorld) =
+    Encode.object
+        [ ( "robot", Robot.encode aWorld.robot )
+        , ( "maze", Maze.encode aWorld.maze )
+        ]
+
+
+decode : Decoder World
+decode =
+    Decode.succeed world
+        |> required "maze" Maze.decode
+        |> required "robot" Robot.decode
