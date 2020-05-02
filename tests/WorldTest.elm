@@ -78,7 +78,7 @@ suite =
                     Expect.equal expected result
             ]
         , describe "decode"
-            [ test "of a maze" <|
+            [ test "of a world" <|
                 \_ ->
                     let
                         aRobot =
@@ -99,7 +99,7 @@ suite =
                                 |> Decode.decodeString World.decode
                     in
                     Expect.equal expected actual
-            , fuzz worldFuzzer "encode decode are inversus" <|
+            , fuzz worldFuzzer "encode decode are inverses" <|
                 \aWorld ->
                     let
                         expected =
