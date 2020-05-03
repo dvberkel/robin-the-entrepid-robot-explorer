@@ -1,7 +1,7 @@
 module World.GPS exposing (Direction(..), Location, advance, coordinates2D, decodeDirection, decodeLocation, encodeDirection, encodeLocation, location, toLeft, toRight)
 
 import Json.Decode as Decode exposing (Decoder, int)
-import Json.Decode.Pipeline exposing (required, resolve)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 
 

@@ -1,9 +1,12 @@
-module World.Maze exposing (Maze, Tile(..), decode, emptyMaze, encode, insertRectangle, insertTile, tileAt)
+module World.Maze exposing (Maze, Tile(..), boundingBox, decode, emptyMaze, encode, insertRectangle, insertTile, tileAt, view)
 
 import Dict exposing (Dict)
+import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (hardcoded)
 import Json.Encode as Encode
+import Svg
+import Svg.Attributes as Attribute
 import World.GPS as GPS exposing (Location, location)
 
 
@@ -15,6 +18,7 @@ type Tile
     = Floor
     | Pit
     | Wall
+    | Target
 
 
 emptyMaze : Maze
@@ -23,7 +27,13 @@ emptyMaze =
 
 
 insertRectangle : ( Location, Location ) -> Tile -> Maze -> Maze
-insertRectangle ( lowerLeft, upperRight ) element aMaze =
+insertRectangle aBoundingBox element aMaze =
+    locationsIn aBoundingBox
+        |> List.foldl (swap insertTile <| element) aMaze
+
+
+locationsIn : ( Location, Location ) -> List Location
+locationsIn ( lowerLeft, upperRight ) =
     let
         ( llx, lly ) =
             GPS.coordinates2D lowerLeft
@@ -39,7 +49,6 @@ insertRectangle ( lowerLeft, upperRight ) element aMaze =
     in
     cartesianProduct xs ys
         |> List.map (unpack GPS.location)
-        |> List.foldl (swap insertTile <| element) aMaze
 
 
 unpack : (a -> b -> c) -> ( a, b ) -> c
@@ -129,6 +138,9 @@ encodeTile tile =
 
                 Wall ->
                     "Wall"
+
+                Target ->
+                    "Target"
     in
     Encode.string value
 
@@ -220,6 +232,9 @@ decodeTile =
                 "Wall" ->
                     Decode.succeed Wall
 
+                "Target" ->
+                    Decode.succeed Target
+
                 _ ->
                     Decode.fail <| "'" ++ input ++ "' is not a tile"
     in
@@ -245,3 +260,86 @@ parseLocation input =
 
 type LocationParseError
     = NotALocation String
+
+
+view : Maze -> Html msg
+view aMaze =
+    let
+        toTile aLocation =
+            ( aLocation, tileAt aLocation aMaze )
+
+        tiles =
+            aMaze
+                |> boundingBox
+                |> Maybe.map locationsIn
+                |> Maybe.withDefault []
+                |> List.map toTile
+                |> List.map viewTile
+    in
+    Svg.g [] tiles
+
+
+boundingBox : Maze -> Maybe ( Location, Location )
+boundingBox (Maze dictionary) =
+    let
+        switch ( y, x ) =
+            ( x, y )
+
+        pairUp ( x, ys ) =
+            ys
+                |> Dict.map (\_ _ -> x)
+                |> Dict.toList
+                |> List.map switch
+
+        pairs =
+            dictionary
+                |> Dict.toList
+                |> List.concatMap pairUp
+
+        extremize extremizer ( x, y ) ( ex, ey ) =
+            ( extremizer x ex, extremizer y ey )
+
+        gather p =
+            ( List.foldl (extremize min) p pairs
+            , List.foldl (extremize max) p pairs
+            )
+
+        toBoundingBox ( ( llx, lly ), ( urx, ury ) ) =
+            ( location llx lly, location urx ury )
+    in
+    pairs
+        |> List.head
+        |> Maybe.map gather
+        |> Maybe.map toBoundingBox
+
+
+viewTile : ( Location, Tile ) -> Html msg
+viewTile ( aLocation, tile ) =
+    let
+        fillColor =
+            case tile of
+                Pit ->
+                    "black"
+
+                Floor ->
+                    "blue"
+
+                Wall ->
+                    "red"
+                
+                Target ->
+                    "green"
+
+        ( x, y ) =
+            GPS.coordinates2D aLocation
+    in
+    Svg.rect
+        [ Attribute.fill fillColor
+        , Attribute.width "1"
+        , Attribute.height "1"
+        , Attribute.rx "0.1"
+        , Attribute.ry "0.1"
+        , Attribute.x <| String.fromInt x
+        , Attribute.y <| String.fromInt y
+        ]
+        []

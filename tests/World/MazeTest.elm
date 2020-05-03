@@ -68,4 +68,5 @@ tileFuzzer =
         [ constant Floor
         , constant Pit
         , constant Wall
+        , constant Target
         ]

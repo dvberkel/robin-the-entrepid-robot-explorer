@@ -6,14 +6,14 @@
             "direction": "North"
         },
         "maze": {
-            "-1,-1": "Floor",
+            "-1,-1": "Pit",
             "0,-1": "Floor",
             "1,-1": "Floor",
             "-1,0": "Floor",
             "0,0": "Floor",
             "1,0": "Floor",
             "-1,1": "Floor",
-            "0,1": "Floor",
+            "0,1": "Target",
             "1,1": "Wall"
         }
     }

@@ -111,6 +111,7 @@ connectingToLevel _ =
 controlLevel : Level -> List (Html Msg)
 controlLevel aLevel =
     [ Html.h1 [] [ Html.text <| "Level " ++ levelName aLevel.index ]
+    , World.view aLevel.world
     ]
 
 
