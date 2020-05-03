@@ -124,4 +124,5 @@ view (World aWorld) =
             ]
             []
         , Maze.view aWorld.maze
+        , Robot.view aWorld.robot
         ]

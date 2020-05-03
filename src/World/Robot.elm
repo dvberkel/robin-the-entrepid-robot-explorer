@@ -1,9 +1,12 @@
-module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot)
+module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot, view)
 
+import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import World.GPS as GPS exposing (Direction, Location, advance, toLeft, toRight)
+import Svg
+import Svg.Attributes as Attribute
+import World.GPS as GPS exposing (Direction(..), Location, advance, toLeft, toRight)
 
 
 type Robot
@@ -70,3 +73,54 @@ decode =
     Decode.succeed robot
         |> required "direction" GPS.decodeDirection
         |> required "location" GPS.decodeLocation
+
+
+view : Robot -> Html msg
+view (Robot aRobot) =
+    let
+        ( x, y ) =
+            GPS.coordinates2D aRobot.location
+
+        toTranslate coordinates =
+            "translate(" ++ coordinates ++ ")"
+
+        translate =
+            [ x, y ]
+                |> List.map toFloat
+                |> List.map (\z -> z + 0.5)
+                |> List.map String.fromFloat
+                |> String.join ","
+                |> toTranslate
+
+        orientation =
+            case aRobot.direction of
+                North ->
+                    "rotate(0)"
+
+                East ->
+                    "rotate(90)"
+
+                South ->
+                    "rotate(180)"
+
+                West ->
+                    "rotate(-90)"
+    in
+    Svg.g [ Attribute.transform translate ]
+        [ Svg.g [ Attribute.transform <| String.join " " [ orientation, "scale(0.7978)" ] ]
+            [ Svg.circle
+                [ Attribute.cx "0"
+                , Attribute.cy "0"
+                , Attribute.r "0.5"
+                , Attribute.fill "silver"
+                ]
+                []
+            , Svg.circle
+                [ Attribute.cx "0"
+                , Attribute.cy "0.4"
+                , Attribute.r "0.1"
+                , Attribute.fill "green"
+                ]
+                []
+            ]
+        ]
