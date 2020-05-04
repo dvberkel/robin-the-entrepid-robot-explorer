@@ -47,13 +47,18 @@ init levelIndex _ =
 
 type Model
     = Loading Int
-    | Loaded Level
+    | Loaded ControlRoom
     | Failure Problem
 
 
 type Problem
     = Fetch Http.Error
     | Parse String
+
+
+type alias ControlRoom =
+    { level : Level
+    }
 
 
 type alias Level =
@@ -92,8 +97,8 @@ view model =
                 Loading levelIndex ->
                     connectingToLevel levelIndex
 
-                Loaded levelIndex ->
-                    controlLevel levelIndex
+                Loaded controlRoom ->
+                    control controlRoom
 
                 Failure problem ->
                     connectionFailure problem
@@ -108,10 +113,10 @@ connectingToLevel _ =
     [ Html.h1 [] [ Html.text "patching into CCTV stream" ] ]
 
 
-controlLevel : Level -> List (Html Msg)
-controlLevel aLevel =
-    [ Html.h1 [] [ Html.text <| "Level " ++ levelName aLevel.index ]
-    , World.view aLevel.world
+control : ControlRoom -> List (Html Msg)
+control controlRoom =
+    [ Html.h1 [] [ Html.text <| "Level " ++ levelName controlRoom.level.index ]
+    , World.view controlRoom.level.world
     ]
 
 
@@ -130,7 +135,7 @@ levelName index =
 
 connectionFailure : Problem -> List (Html Msg)
 connectionFailure problem =
-    [ Html.h1 [] [ Html.text <| "electric interference prevents stable CCTV patch"]
+    [ Html.h1 [] [ Html.text <| "electric interference prevents stable CCTV patch" ]
     , Html.p [] [ Html.text <| Debug.toString problem ]
     ]
 
@@ -144,7 +149,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message _ =
     case message of
         ReceivedLevel aLevel ->
-            ( Loaded aLevel, Cmd.none )
+            let
+                controlRoom =
+                    { level = aLevel }
+            in
+            ( Loaded controlRoom, Cmd.none )
 
         LoadError problem ->
             ( Failure problem, Cmd.none )
