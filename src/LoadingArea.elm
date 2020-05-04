@@ -4,7 +4,7 @@ import Browser
 import Debug
 import Html exposing (Html)
 import Http exposing (Error(..))
-import ControlRoom exposing (ControlRoom, Level, levelName, controlRoom)
+import Control.ControlRoom as ControlRoom exposing (ControlRoom, Level, levelName, controlRoom)
 
 main : Program () Model Msg
 main =

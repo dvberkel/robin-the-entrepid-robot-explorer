@@ -1,4 +1,4 @@
-module ControlRoom exposing (ControlRoom, Level, controlRoom, decode, encode, level, levelName, view)
+module Control.ControlRoom exposing (ControlRoom, Level, controlRoom, decode, encode, level, levelName, view)
 
 import Html exposing (Html)
 import Http exposing (Error(..))
