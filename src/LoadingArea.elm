@@ -1,10 +1,12 @@
 module LoadingArea exposing (main)
 
 import Browser
+import Control.ControlRoom as ControlRoom exposing (ControlRoom, controlRoom)
+import Control.Level as Level exposing (Level)
 import Debug
 import Html exposing (Html)
 import Http exposing (Error(..))
-import Control.ControlRoom as ControlRoom exposing (ControlRoom, Level, levelName, controlRoom)
+
 
 main : Program () Model Msg
 main =
@@ -34,8 +36,8 @@ init levelIndex _ =
 
         loadCommand =
             Http.get
-                { url = "levels/" ++ levelName levelIndex ++ ".json"
-                , expect = Http.expectJson handler ControlRoom.decode
+                { url = "levels/" ++ Level.name levelIndex ++ ".json"
+                , expect = Http.expectJson handler Level.decode
                 }
     in
     ( Loading levelIndex, loadCommand )
@@ -50,6 +52,7 @@ type Model
 type Problem
     = Fetch Http.Error
     | Parse String
+
 
 view : Model -> Browser.Document Msg
 view model =
@@ -73,6 +76,7 @@ view model =
 connectingToLevel : Int -> List (Html Msg)
 connectingToLevel _ =
     [ Html.h1 [] [ Html.text "patching into CCTV stream" ] ]
+
 
 connectionFailure : Problem -> List (Html Msg)
 connectionFailure problem =
