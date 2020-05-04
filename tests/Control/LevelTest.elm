@@ -1,4 +1,4 @@
-module ControlRoomTest exposing (levelFuzzer, suite)
+module Control.LevelTest exposing (levelFuzzer, suite)
 
 import Expect
 import Fuzz exposing (Fuzzer, int)
@@ -14,7 +14,7 @@ import WorldTest exposing (worldFuzzer)
 
 suite : Test
 suite =
-    describe "ControlRoom"
+    describe "Level"
         [ describe "decode"
             [ test "of a level" <|
                 \_ ->

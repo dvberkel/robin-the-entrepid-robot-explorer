@@ -1,24 +1,44 @@
-module Control.ControlRoom exposing (ControlRoom, controlRoom, view)
+module Control.ControlRoom exposing (ControlRoom, Msg, controlRoom, update, view)
 
 import Control.Level as Level exposing (Level)
+import Editor exposing (Editor)
+import EditorMsg exposing (EMsg)
 import Html exposing (Html)
 
 
-type alias ControlRoom =
-    { level : Level
-    , code : String
-    }
+type ControlRoom
+    = ControlRoom
+        { level : Level
+        , editor : Editor
+        }
 
 
 controlRoom : Level -> ControlRoom
 controlRoom aLevel =
-    { level = aLevel
-    , code = ""
-    }
+    ControlRoom
+        { level = aLevel
+        , editor = Editor.initWithContent "Forward" ()
+        }
 
 
-view : ControlRoom -> List (Html msg)
-view aControlRoom =
+type Msg
+    = EditorMsg EditorMsg.EMsg
+
+
+update : Msg -> ControlRoom -> ( ControlRoom, Cmd Msg )
+update message (ControlRoom aControlRoom) =
+    case message of
+        EditorMsg editorMessage ->
+            let
+                ( editor, cmd ) =
+                    Editor.update editorMessage aControlRoom.editor
+            in
+            ( ControlRoom { aControlRoom | editor = editor }, Cmd.map EditorMsg cmd )
+
+
+view : ControlRoom -> List (Html Msg)
+view (ControlRoom aControlRoom) =
     [ Html.h1 [] [ Html.text "Control" ]
     , Level.view aControlRoom.level
+    , Editor.view aControlRoom.editor |> Html.map EditorMsg
     ]
