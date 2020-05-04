@@ -1,8 +1,8 @@
-module Control.ControlRoom exposing (ControlRoom, Msg, controlRoom, update, view)
+module Control.ControlRoom exposing (ControlRoom, Msg(..), controlRoom, update, view)
 
 import Control.Level as Level exposing (Level)
 import Editor exposing (Editor)
-import EditorMsg exposing (EMsg)
+import EditorMsg exposing (EMsg, WrapOption(..))
 import Html exposing (Html)
 
 
@@ -17,7 +17,15 @@ controlRoom : Level -> ControlRoom
 controlRoom aLevel =
     ControlRoom
         { level = aLevel
-        , editor = Editor.initWithContent "Forward" ()
+        , editor =
+            Editor.initWithContent "Forward"
+                { width = 640
+                , height = 640
+                , fontSize = 16
+                , verticalScrollOffset = 3
+                , debugOn = False
+                , wrapOption = DontWrap
+                }
         }
 
 

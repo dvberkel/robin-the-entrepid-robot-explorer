@@ -64,6 +64,7 @@ view model =
 
                 Loaded aControlRoom ->
                     ControlRoom.view aControlRoom
+                        |> List.map (Html.map ControlRoomMsg)
 
                 Failure problem ->
                     connectionFailure problem
@@ -88,16 +89,29 @@ connectionFailure problem =
 type Msg
     = ReceivedLevel Level
     | LoadError Problem
+    | ControlRoomMsg ControlRoom.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message _ =
+update message model =
     case message of
         ReceivedLevel aLevel ->
             ( Loaded <| controlRoom aLevel, Cmd.none )
 
         LoadError problem ->
             ( Failure problem, Cmd.none )
+
+        ControlRoomMsg controlRoomMessage ->
+            case model of
+                Loaded aControlRoom ->
+                    let
+                        ( nextControlRoom, cmd ) =
+                            ControlRoom.update controlRoomMessage aControlRoom
+                    in
+                    ( Loaded nextControlRoom, Cmd.map ControlRoomMsg cmd )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
