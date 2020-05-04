@@ -58,6 +58,14 @@ type Problem
 
 type alias ControlRoom =
     { level : Level
+    , code : String
+    }
+
+
+controlRoom : Level -> ControlRoom
+controlRoom aLevel =
+    { level = aLevel
+    , code = ""
     }
 
 
@@ -97,8 +105,8 @@ view model =
                 Loading levelIndex ->
                     connectingToLevel levelIndex
 
-                Loaded controlRoom ->
-                    control controlRoom
+                Loaded aControlRoom ->
+                    control aControlRoom
 
                 Failure problem ->
                     connectionFailure problem
@@ -114,9 +122,9 @@ connectingToLevel _ =
 
 
 control : ControlRoom -> List (Html Msg)
-control controlRoom =
-    [ Html.h1 [] [ Html.text <| "Level " ++ levelName controlRoom.level.index ]
-    , World.view controlRoom.level.world
+control aControlRoom =
+    [ Html.h1 [] [ Html.text <| "Level " ++ levelName aControlRoom.level.index ]
+    , World.view aControlRoom.level.world
     ]
 
 
@@ -149,11 +157,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message _ =
     case message of
         ReceivedLevel aLevel ->
-            let
-                controlRoom =
-                    { level = aLevel }
-            in
-            ( Loaded controlRoom, Cmd.none )
+            ( Loaded <| controlRoom aLevel, Cmd.none )
 
         LoadError problem ->
             ( Failure problem, Cmd.none )
