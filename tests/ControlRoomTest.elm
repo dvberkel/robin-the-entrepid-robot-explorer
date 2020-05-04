@@ -1,11 +1,10 @@
-module ControlRoomTest exposing (suite, levelFuzzer)
+module ControlRoomTest exposing (levelFuzzer, suite)
 
-import ControlRoom exposing (level)
 import Expect
 import Fuzz exposing (Fuzzer, int)
 import Json.Decode as Decode
+import Control.Level as Level exposing (Level, level)
 import Test exposing (Test, describe, fuzz, test)
-import ControlRoom exposing (Level, level)
 import World exposing (world)
 import World.GPS exposing (Direction(..), location)
 import World.Maze exposing (Tile(..), emptyMaze, insertTile)
@@ -36,7 +35,7 @@ suite =
 
                         actual =
                             """{"index": 0, "world": {"robot": {"location": {"x": 0, "y": 0}, "direction": "North"}, "maze": {"0,0": "Floor", "0,1": "Wall"}}}"""
-                                |> Decode.decodeString ControlRoom.decode
+                                |> Decode.decodeString Level.decode
                     in
                     Expect.equal expected actual
             , fuzz levelFuzzer "encode decode are inverses" <|
@@ -48,8 +47,8 @@ suite =
 
                         actual =
                             aLevel
-                                |> ControlRoom.encode
-                                |> Decode.decodeValue ControlRoom.decode
+                                |> Level.encode
+                                |> Decode.decodeValue Level.decode
                     in
                     Expect.equal expected actual
             ]
