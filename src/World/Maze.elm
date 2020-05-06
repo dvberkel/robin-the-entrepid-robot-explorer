@@ -326,7 +326,7 @@ viewTile ( aLocation, tile ) =
 
                 Wall ->
                     "red"
-                
+
                 Target ->
                     "green"
 

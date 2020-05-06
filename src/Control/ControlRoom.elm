@@ -4,6 +4,7 @@ import Control.Level as Level exposing (Level)
 import Editor exposing (Editor)
 import EditorMsg exposing (EMsg, WrapOption(..))
 import Html exposing (Html)
+import Html.Events as Event
 
 
 type ControlRoom
@@ -31,6 +32,7 @@ controlRoom aLevel =
 
 type Msg
     = EditorMsg EditorMsg.EMsg
+    | Execute
 
 
 update : Msg -> ControlRoom -> ( ControlRoom, Cmd Msg )
@@ -43,10 +45,18 @@ update message (ControlRoom aControlRoom) =
             in
             ( ControlRoom { aControlRoom | editor = editor }, Cmd.map EditorMsg cmd )
 
+        Execute ->
+            let
+                source =
+                    Editor.getContent aControlRoom.editor
+            in
+            ( ControlRoom { aControlRoom | level = Level.process source aControlRoom.level }, Cmd.none )
+
 
 view : ControlRoom -> List (Html Msg)
 view (ControlRoom aControlRoom) =
     [ Html.h1 [] [ Html.text "Control" ]
     , Level.view aControlRoom.level
+    , Html.button [ Event.onClick Execute ] [ Html.text "execute" ]
     , Editor.view aControlRoom.editor |> Html.map EditorMsg
     ]

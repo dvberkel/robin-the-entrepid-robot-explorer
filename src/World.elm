@@ -64,7 +64,11 @@ execute ( instructionPointer, instruction ) (World aWorld) =
             Err <| FellInAPit instructionPointer targetLocation
 
         Target ->
-            Ok <| World { aWorld | robot = intention } -- TODO mark victory
+            Ok <| World { aWorld | robot = intention }
+
+
+
+-- TODO mark victory
 
 
 type Error
