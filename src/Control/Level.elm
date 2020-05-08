@@ -1,7 +1,7 @@
 module Control.Level exposing (Level, decode, encode, level, name, process, view)
 
 import Control.CAN as CAN
-import Html exposing (Html)
+import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)

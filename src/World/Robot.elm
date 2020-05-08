@@ -1,11 +1,11 @@
 module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot, view)
 
-import Html exposing (Html)
+import Html.Styled as Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import Svg
-import Svg.Attributes as Attribute
+import Svg.Styled as Svg
+import Svg.Styled.Attributes as Attribute
 import World.GPS as GPS exposing (Direction(..), Location, advance, toLeft, toRight)
 
 

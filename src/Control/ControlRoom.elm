@@ -3,8 +3,9 @@ module Control.ControlRoom exposing (ControlRoom, Msg(..), controlRoom, update, 
 import Control.Level as Level exposing (Level)
 import Editor exposing (Editor)
 import EditorMsg exposing (EMsg, WrapOption(..))
-import Html exposing (Html)
-import Html.Events as Event
+import Html as UnstyledHtml
+import Html.Styled as Html exposing (Html)
+import Html.Styled.Events as Event
 
 
 type ControlRoom
@@ -58,5 +59,5 @@ view (ControlRoom aControlRoom) =
     [ Html.h1 [] [ Html.text "Control" ]
     , Level.view aControlRoom.level
     , Html.button [ Event.onClick Execute ] [ Html.text "execute" ]
-    , Editor.view aControlRoom.editor |> Html.map EditorMsg
+    , Editor.view aControlRoom.editor |> Html.fromUnstyled |> Html.map EditorMsg
     ]

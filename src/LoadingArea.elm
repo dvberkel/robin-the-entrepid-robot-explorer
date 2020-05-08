@@ -4,7 +4,7 @@ import Browser
 import Control.ControlRoom as ControlRoom exposing (ControlRoom, controlRoom)
 import Control.Level as Level exposing (Level)
 import Debug
-import Html exposing (Html)
+import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
 
 
@@ -70,7 +70,7 @@ view model =
                     connectionFailure problem
     in
     { title = "Control Room"
-    , body = body
+    , body = body |> List.map Html.toUnstyled
     }
 
 

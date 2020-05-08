@@ -1,11 +1,11 @@
 module World exposing (Error(..), World, decode, encode, executeAll, view, world)
 
-import Html exposing (Html)
+import Html.Styled as Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import Svg
-import Svg.Attributes as Attribute
+import Svg.Styled as Svg
+import Svg.Styled.Attributes as Attribute
 import World.GPS as GPS exposing (Location)
 import World.Maze as Maze exposing (Maze, Tile(..), tileAt)
 import World.Robot as Robot exposing (Instruction, Robot)
