@@ -1,4 +1,4 @@
-module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot, view)
+module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot, view, instructionToString)
 
 import Html.Styled as Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
@@ -38,6 +38,19 @@ type Instruction
     = Forward
     | Left
     | Right
+
+
+instructionToString : Instruction -> String
+instructionToString instruction =
+    case instruction of
+        Forward ->
+            "Forward"
+
+        Left ->
+            "Left"
+
+        Right ->
+            "Right"
 
 
 forward : Robot -> Robot

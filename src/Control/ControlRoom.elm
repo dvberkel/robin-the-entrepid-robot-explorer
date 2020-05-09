@@ -36,6 +36,7 @@ controlRoom aLevel =
 type Msg
     = EditorMsg EditorMsg.EMsg
     | Load
+    | LevelMsg Level.Msg
 
 
 update : Msg -> ControlRoom -> ( ControlRoom, Cmd Msg )
@@ -47,6 +48,13 @@ update message (ControlRoom aControlRoom) =
                     Editor.update editorMessage aControlRoom.editor
             in
             ( ControlRoom { aControlRoom | editor = editor }, Cmd.map EditorMsg cmd )
+
+        LevelMsg levelMessage ->
+            let
+                ( aLevel, cmd ) =
+                    Level.update levelMessage aControlRoom.level
+            in
+            ( ControlRoom { aControlRoom | level = aLevel }, Cmd.map LevelMsg cmd )
 
         Load ->
             let
@@ -68,7 +76,7 @@ view : ControlRoom -> List (Html Msg)
 view (ControlRoom aControlRoom) =
     [ Html.h1 [] [ Html.text "Control" ]
     , Html.div [ Attribute.css [ displayFlex, flexDirection row, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
-        [ Level.view aControlRoom.level
+        [ Level.view aControlRoom.level |> Html.map LevelMsg
         , Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
             [ Html.button [ Event.onClick Load ] [ Html.text "load" ]
             , Editor.view aControlRoom.editor |> Html.fromUnstyled |> Html.map EditorMsg

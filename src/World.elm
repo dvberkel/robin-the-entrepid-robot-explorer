@@ -1,6 +1,6 @@
 module World exposing (Error(..), World, decode, encode, executeAll, view, world)
 
-import Html.Styled as Html exposing (Html)
+import Html.Styled exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode

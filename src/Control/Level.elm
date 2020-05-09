@@ -1,9 +1,12 @@
-module Control.Level exposing (Level, decode, encode, level, name, load, view)
+module Control.Level exposing (Level, Msg(..), decode, encode, level, load, name, update, view)
 
+import Css exposing (..)
 import Html.Styled as Html exposing (Html)
+import Html.Styled.Attributes as Attribute
+import Html.Styled.Events as Event
 import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline as Pipeline
 import Json.Encode as Encode
 import World exposing (World)
 import World.Robot as Robot
@@ -37,14 +40,27 @@ encode (Level aLevel) =
 decode : Decoder Level
 decode =
     Decode.succeed level
-        |> required "index" Decode.int
-        |> required "world" World.decode
+        |> Pipeline.required "index" Decode.int
+        |> Pipeline.required "world" World.decode
 
 
-view : Level -> Html msg
+type Msg
+    = Step
+
+
+update : Msg -> Level -> ( Level, Cmd Msg )
+update message aLevel =
+    case message of
+        Step ->
+            ( step aLevel, Cmd.none )
+
+
+view : Level -> Html Msg
 view (Level aLevel) =
-    Html.div []
-        [ World.view aLevel.world
+    Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
+        [ Html.button [ Event.onClick Step ] [ Html.text "⏵" ]
+        , World.view aLevel.world
+        , Html.div [] <| List.map Html.text <| List.map Robot.instructionToString aLevel.instructions
         ]
 
 
@@ -64,3 +80,18 @@ name index =
 load : List Robot.Instruction -> Level -> Level
 load instructions (Level aLevel) =
     Level { aLevel | instructions = instructions }
+
+
+step : Level -> Level
+step (Level aLevel) =
+    let
+        nextWorld =
+            case World.executeAll aLevel.instructions aLevel.world of
+                Ok w ->
+                    w
+
+                -- TODO error handling
+                Err _ ->
+                    aLevel.world
+    in
+    Level { aLevel | world = nextWorld }

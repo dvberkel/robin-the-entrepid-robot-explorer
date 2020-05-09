@@ -36,7 +36,7 @@ init levelIndex _ =
 
         loadCommand =
             Http.get
-                { url = "levels/" ++ Level.name levelIndex ++ ".json"
+                { url = "/levels/" ++ Level.name levelIndex ++ ".json"
                 , expect = Http.expectJson handler Level.decode
                 }
     in
