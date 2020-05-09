@@ -1,18 +1,19 @@
-module Control.Level exposing (Level, decode, encode, level, name, process, view)
+module Control.Level exposing (Level, decode, encode, level, name, load, view)
 
-import Control.CAN as CAN
 import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 import World exposing (World)
+import World.Robot as Robot
 
 
 type Level
     = Level
         { index : Int
         , world : World
+        , instructions : List Robot.Instruction
         }
 
 
@@ -21,6 +22,7 @@ level index aWorld =
     Level
         { index = index
         , world = aWorld
+        , instructions = []
         }
 
 
@@ -59,18 +61,6 @@ name index =
     prefix ++ String.fromInt index
 
 
-process : String -> Level -> Level
-process source (Level aLevel) =
-    case CAN.parse source of
-        Ok instructions ->
-            case World.executeAll instructions aLevel.world of
-                Ok nextWorld ->
-                    Level { aLevel | world = nextWorld }
-
-                Err _ ->
-                    -- TODO error handling
-                    Level aLevel
-
-        Err _ ->
-            -- TODO error handling
-            Level aLevel
+load : List Robot.Instruction -> Level -> Level
+load instructions (Level aLevel) =
+    Level { aLevel | instructions = instructions }

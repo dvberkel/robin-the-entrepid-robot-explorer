@@ -1,5 +1,6 @@
 module Control.ControlRoom exposing (ControlRoom, Msg(..), controlRoom, update, view)
 
+import Control.CAN as CAN
 import Control.Level as Level exposing (Level)
 import Css exposing (..)
 import Editor exposing (Editor)
@@ -34,7 +35,7 @@ controlRoom aLevel =
 
 type Msg
     = EditorMsg EditorMsg.EMsg
-    | Execute
+    | Load
 
 
 update : Msg -> ControlRoom -> ( ControlRoom, Cmd Msg )
@@ -47,12 +48,20 @@ update message (ControlRoom aControlRoom) =
             in
             ( ControlRoom { aControlRoom | editor = editor }, Cmd.map EditorMsg cmd )
 
-        Execute ->
+        Load ->
             let
                 source =
                     Editor.getContent aControlRoom.editor
+
+                instructions =
+                    case CAN.parse source of
+                        Ok ins ->
+                            ins
+
+                        Err _ ->
+                            []
             in
-            ( ControlRoom { aControlRoom | level = Level.process source aControlRoom.level }, Cmd.none )
+            ( ControlRoom { aControlRoom | level = Level.load instructions aControlRoom.level }, Cmd.none )
 
 
 view : ControlRoom -> List (Html Msg)
@@ -61,7 +70,7 @@ view (ControlRoom aControlRoom) =
     , Html.div [ Attribute.css [ displayFlex, flexDirection row, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
         [ Level.view aControlRoom.level
         , Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
-            [ Html.button [ Event.onClick Execute ] [ Html.text "execute" ]
+            [ Html.button [ Event.onClick Load ] [ Html.text "load" ]
             , Editor.view aControlRoom.editor |> Html.fromUnstyled |> Html.map EditorMsg
             ]
         ]
