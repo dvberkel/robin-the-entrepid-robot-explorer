@@ -1,10 +1,11 @@
 module Control.ControlRoom exposing (ControlRoom, Msg(..), controlRoom, update, view)
 
 import Control.Level as Level exposing (Level)
+import Css exposing (..)
 import Editor exposing (Editor)
 import EditorMsg exposing (EMsg, WrapOption(..))
-import Html as UnstyledHtml
 import Html.Styled as Html exposing (Html)
+import Html.Styled.Attributes as Attribute
 import Html.Styled.Events as Event
 
 
@@ -57,7 +58,11 @@ update message (ControlRoom aControlRoom) =
 view : ControlRoom -> List (Html Msg)
 view (ControlRoom aControlRoom) =
     [ Html.h1 [] [ Html.text "Control" ]
-    , Level.view aControlRoom.level
-    , Html.button [ Event.onClick Execute ] [ Html.text "execute" ]
-    , Editor.view aControlRoom.editor |> Html.fromUnstyled |> Html.map EditorMsg
+    , Html.div [ Attribute.css [ displayFlex, flexDirection row, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
+        [ Level.view aControlRoom.level
+        , Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
+            [ Html.button [ Event.onClick Execute ] [ Html.text "execute" ]
+            , Editor.view aControlRoom.editor |> Html.fromUnstyled |> Html.map EditorMsg
+            ]
+        ]
     ]
