@@ -8,12 +8,14 @@ import Debug
 import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
 import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>), (<?>), Parser, s)
+import Url.Parser.Query as Query
 
 
 main : Program () Model Msg
 main =
     Browser.application
-        { init = init 0
+        { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -22,8 +24,26 @@ main =
         }
 
 
-init : Int -> () -> Url -> Key -> ( Model, Cmd Msg )
-init levelIndex _ _ key =
+init : () -> Url -> Key -> ( Model, Cmd Msg )
+init _ url key =
+    case Parser.parse levelQuery url of
+        Just (Just levelIndex) ->
+            ( Loading levelIndex, loadCommand levelIndex )
+
+        Just Nothing ->
+            ( Loading 0, loadCommand 0 )
+
+        Nothing ->
+            ( Failure <| LevelQuery url, Cmd.none )
+
+
+levelQuery : Parser (Maybe Int -> a) a
+levelQuery =
+    s "src" </> s "LoadingArea.elm" <?> Query.int "level"
+
+
+loadCommand : Int -> Cmd Msg
+loadCommand levelIndex =
     let
         handler response =
             case response of
@@ -37,14 +57,11 @@ init levelIndex _ _ key =
 
                         _ ->
                             LoadError <| Fetch error
-
-        loadCommand =
-            Http.get
-                { url = "/levels/" ++ Level.name levelIndex ++ ".json"
-                , expect = Http.expectJson handler Level.decode
-                }
     in
-    ( Loading levelIndex, loadCommand )
+    Http.get
+        { url = "/levels/" ++ Level.name levelIndex ++ ".json"
+        , expect = Http.expectJson handler Level.decode
+        }
 
 
 type Model
@@ -54,7 +71,8 @@ type Model
 
 
 type Problem
-    = Fetch Http.Error
+    = LevelQuery Url
+    | Fetch Http.Error
     | Parse String
 
 
@@ -91,7 +109,7 @@ connectionFailure problem =
 
 
 type Msg
-    = Idle 
+    = Idle
     | ReceivedLevel Level
     | LoadError Problem
     | ControlRoomMsg ControlRoom.Msg
@@ -130,6 +148,7 @@ subscriptions _ =
 onUrlChange : Url -> Msg
 onUrlChange _ =
     Idle
+
 
 onUrlRequest : UrlRequest -> Msg
 onUrlRequest _ =
