@@ -1,25 +1,29 @@
 module LoadingArea exposing (main)
 
-import Browser
+import Browser exposing (UrlRequest)
+import Browser.Navigation as Navigation exposing (Key)
 import Control.ControlRoom as ControlRoom exposing (ControlRoom, controlRoom)
 import Control.Level as Level exposing (Level)
 import Debug
 import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
+import Url exposing (Url)
 
 
 main : Program () Model Msg
 main =
-    Browser.document
+    Browser.application
         { init = init 0
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlChange = onUrlChange
+        , onUrlRequest = onUrlRequest
         }
 
 
-init : Int -> () -> ( Model, Cmd Msg )
-init levelIndex _ =
+init : Int -> () -> Url -> Key -> ( Model, Cmd Msg )
+init levelIndex _ _ key =
     let
         handler response =
             case response of
@@ -87,7 +91,8 @@ connectionFailure problem =
 
 
 type Msg
-    = ReceivedLevel Level
+    = Idle 
+    | ReceivedLevel Level
     | LoadError Problem
     | ControlRoomMsg ControlRoom.Msg
 
@@ -95,6 +100,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
+        Idle ->
+            ( model, Cmd.none )
+
         ReceivedLevel aLevel ->
             ( Loaded <| controlRoom aLevel, Cmd.none )
 
@@ -117,3 +125,12 @@ update message model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
+
+
+onUrlChange : Url -> Msg
+onUrlChange _ =
+    Idle
+
+onUrlRequest : UrlRequest -> Msg
+onUrlRequest _ =
+    Idle
