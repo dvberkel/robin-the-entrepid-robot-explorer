@@ -1,4 +1,4 @@
-module Control.Level exposing (Level, Msg(..), decode, encode, level, load, name, update, view)
+module Control.Level exposing (Level, Msg(..), decode, encode, levelIndex, level, load, name, update, view)
 
 import Css exposing (..)
 import Html.Styled as Html exposing (Html)
@@ -27,6 +27,11 @@ level index aWorld =
         , world = aWorld
         , instructions = []
         }
+
+
+levelIndex : Level -> Int
+levelIndex (Level { index }) =
+    index
 
 
 encode : Level -> Encode.Value

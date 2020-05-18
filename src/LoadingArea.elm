@@ -8,6 +8,7 @@ import Debug
 import Html.Styled as Html exposing (Html)
 import Http exposing (Error(..))
 import Url exposing (Url)
+import Url.Builder as Builder
 import Url.Parser as Parser exposing ((</>), (<?>), Parser, s)
 import Url.Parser.Query as Query
 
@@ -25,16 +26,16 @@ main =
 
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
-init _ url key =
+init _ url aKey =
     case Parser.parse levelQuery url of
         Just (Just levelIndex) ->
-            ( Loading levelIndex, loadCommand levelIndex )
+            ( Loading aKey levelIndex, loadCommand levelIndex )
 
         Just Nothing ->
-            ( Loading 0, loadCommand 0 )
+            ( Loading aKey 0, loadCommand 0 )
 
         Nothing ->
-            ( Failure <| LevelQuery url, Cmd.none )
+            ( Failure aKey <| LevelQuery url, Cmd.none )
 
 
 levelQuery : Parser (Maybe Int -> a) a
@@ -65,9 +66,22 @@ loadCommand levelIndex =
 
 
 type Model
-    = Loading Int
-    | Loaded ControlRoom
-    | Failure Problem
+    = Loading Key Int
+    | Loaded Key ControlRoom
+    | Failure Key Problem
+
+
+key : Model -> Key
+key model =
+    case model of
+        Loading aKey _ ->
+            aKey
+
+        Loaded aKey _ ->
+            aKey
+
+        Failure aKey _ ->
+            aKey
 
 
 type Problem
@@ -81,14 +95,14 @@ view model =
     let
         body =
             case model of
-                Loading levelIndex ->
+                Loading _ levelIndex ->
                     connectingToLevel levelIndex
 
-                Loaded aControlRoom ->
+                Loaded _ aControlRoom ->
                     ControlRoom.view aControlRoom
                         |> List.map (Html.map ControlRoomMsg)
 
-                Failure problem ->
+                Failure _ problem ->
                     connectionFailure problem
     in
     { title = "Control Room"
@@ -122,19 +136,26 @@ update message model =
             ( model, Cmd.none )
 
         ReceivedLevel aLevel ->
-            ( Loaded <| controlRoom aLevel, Cmd.none )
+            let
+                aKey =
+                    key model
+
+                url =
+                    Builder.relative [] [ Builder.string "level" <| String.fromInt <| Level.levelIndex aLevel ]
+            in
+            ( Loaded aKey <| controlRoom aLevel, Navigation.replaceUrl aKey url )
 
         LoadError problem ->
-            ( Failure problem, Cmd.none )
+            ( Failure (key model) problem, Cmd.none )
 
         ControlRoomMsg controlRoomMessage ->
             case model of
-                Loaded aControlRoom ->
+                Loaded aKey aControlRoom ->
                     let
                         ( nextControlRoom, cmd ) =
                             ControlRoom.update controlRoomMessage aControlRoom
                     in
-                    ( Loaded nextControlRoom, Cmd.map ControlRoomMsg cmd )
+                    ( Loaded aKey nextControlRoom, Cmd.map ControlRoomMsg cmd )
 
                 _ ->
                     ( model, Cmd.none )
