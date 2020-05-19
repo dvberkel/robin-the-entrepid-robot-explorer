@@ -1,4 +1,4 @@
-module Control.Level exposing (Level, Msg(..), decode, encode, levelIndex, level, load, name, update, view)
+module Control.Level exposing (Level, Msg(..), decode, encode, level, levelIndex, load, name, update, view)
 
 import Css exposing (..)
 import Html.Styled as Html exposing (Html)
@@ -62,10 +62,19 @@ update message aLevel =
 
 view : Level -> Html Msg
 view (Level aLevel) =
+    let
+        instructions =
+            aLevel.instructions
+                |> List.map Robot.instructionToString
+                |> String.join ","
+
+        text =
+            "[" ++ instructions ++ "]"
+    in
     Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
         [ Html.button [ Event.onClick Step ] [ Html.text "⏵" ]
         , World.view aLevel.world
-        , Html.div [] <| List.map Html.text <| List.map Robot.instructionToString aLevel.instructions
+        , Html.div [] [ Html.text text ]
         ]
 
 

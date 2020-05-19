@@ -1,9 +1,8 @@
 module World.Maze exposing (Maze, Tile(..), boundingBox, decode, emptyMaze, encode, insertRectangle, insertTile, tileAt, view)
 
 import Dict exposing (Dict)
-import Html.Styled as Html exposing (Html)
+import Html.Styled exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (hardcoded)
 import Json.Encode as Encode
 import Svg.Styled as Svg
 import Svg.Styled.Attributes as Attribute

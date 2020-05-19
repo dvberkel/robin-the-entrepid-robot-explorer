@@ -4,7 +4,7 @@ import Control.CAN as CAN
 import Control.Level as Level exposing (Level)
 import Css exposing (..)
 import Editor exposing (Editor)
-import EditorMsg exposing (EMsg, WrapOption(..))
+import EditorMsg exposing (WrapOption(..))
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attribute
 import Html.Styled.Events as Event
