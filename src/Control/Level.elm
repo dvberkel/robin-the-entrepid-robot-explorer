@@ -17,6 +17,7 @@ type Level
         { index : Int
         , world : World
         , instructions : List Robot.Instruction
+        , instructionPointer : Maybe Int
         }
 
 
@@ -26,6 +27,7 @@ level index aWorld =
         { index = index
         , world = aWorld
         , instructions = []
+        , instructionPointer = Nothing
         }
 
 
@@ -50,12 +52,16 @@ decode =
 
 
 type Msg
-    = Step
+    = Reset
+    | Step
 
 
 update : Msg -> Level -> ( Level, Cmd Msg )
 update message aLevel =
     case message of
+        Reset ->
+            ( reset aLevel, Cmd.none )
+
         Step ->
             ( step aLevel, Cmd.none )
 
@@ -72,7 +78,10 @@ view (Level aLevel) =
             "[" ++ instructions ++ "]"
     in
     Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
-        [ Html.button [ Event.onClick Step ] [ Html.text "⏵" ]
+        [ Html.div []
+            [ Html.button [ Event.onClick Reset ] [ Html.text "↻" ]
+            , Html.button [ Event.onClick Step ] [ Html.text "⏵" ]
+            ]
         , World.view aLevel.world
         , Html.div [] [ Html.text text ]
         ]
@@ -93,7 +102,23 @@ name index =
 
 load : List Robot.Instruction -> Level -> Level
 load instructions (Level aLevel) =
-    Level { aLevel | instructions = instructions }
+    Level
+        { aLevel
+            | instructions = instructions
+            , instructionPointer =
+                instructions
+                    |> List.head
+                    |> Maybe.map (\_ -> 0)
+        }
+
+
+reset : Level -> Level
+reset (Level aLevel) =
+    Level
+        { aLevel
+            | world = World.reset aLevel.world
+            , instructionPointer = Maybe.map (\_ -> 0) aLevel.instructionPointer
+        }
 
 
 step : Level -> Level

@@ -1,4 +1,4 @@
-module World exposing (Error(..), World, decode, encode, executeAll, view, world)
+module World exposing (Error(..), World, decode, encode, executeAll, reset, view, world)
 
 import Html.Styled exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
@@ -14,6 +14,7 @@ import World.Robot as Robot exposing (Instruction, Robot)
 type World
     = World
         { robot : Robot
+        , initialRobot : Robot
         , maze : Maze
         }
 
@@ -22,8 +23,14 @@ world : Maze -> Robot -> World
 world aMaze aRobot =
     World
         { robot = aRobot
+        , initialRobot = aRobot
         , maze = aMaze
         }
+
+
+reset : World -> World
+reset (World aWorld) =
+    World { aWorld | robot = aWorld.initialRobot }
 
 
 executeAll : List Instruction -> World -> Result Error World
