@@ -8,7 +8,7 @@ import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline
 import Json.Encode as Encode
-import World exposing (World)
+import World exposing (Error(..), World)
 import World.Robot as Robot
 
 
@@ -18,7 +18,14 @@ type Level
         , world : World
         , instructions : List Robot.Instruction
         , instructionPointer : Maybe Int
+        , notification : Notification
         }
+
+
+type Notification
+    = Silent
+    | Problem String
+    | Announcement String
 
 
 level : Int -> World -> Level
@@ -28,6 +35,7 @@ level index aWorld =
         , world = aWorld
         , instructions = []
         , instructionPointer = Nothing
+        , notification = Silent
         }
 
 
@@ -54,6 +62,7 @@ decode =
 type Msg
     = Reset
     | Step
+    | Run
 
 
 update : Msg -> Level -> ( Level, Cmd Msg )
@@ -65,6 +74,9 @@ update message aLevel =
         Step ->
             ( step aLevel, Cmd.none )
 
+        Run ->
+            ( run aLevel, Cmd.none )
+
 
 view : Level -> Html Msg
 view (Level aLevel) =
@@ -74,16 +86,26 @@ view (Level aLevel) =
                 |> List.map Robot.instructionToString
                 |> String.join ","
 
-        text =
-            "[" ++ instructions ++ "]"
+        announcement =
+            case aLevel.notification of
+                Silent ->
+                    ""
+
+                Problem problem ->
+                    problem
+
+                Announcement message ->
+                    message
     in
     Html.div [ Attribute.css [ displayFlex, flexDirection column, flexWrap noWrap, justifyContent flexStart, alignItems flexStart ] ]
         [ Html.div []
             [ Html.button [ Event.onClick Reset ] [ Html.text "↻" ]
-            , Html.button [ Event.onClick Step ] [ Html.text "⏵" ]
+            , Html.button [ Event.onClick Step ] [ Html.text "→" ]
+            , Html.button [ Event.onClick Run ] [ Html.text "⇥" ]
             ]
         , World.view aLevel.world
-        , Html.div [] [ Html.text text ]
+        , Html.div [ Attribute.css [ backgroundColor (rgb 211 211 211) ] ] [ Html.text instructions ]
+        , Html.div [] [ Html.text announcement ]
         ]
 
 
@@ -124,13 +146,71 @@ reset (Level aLevel) =
 step : Level -> Level
 step (Level aLevel) =
     let
-        nextWorld =
-            case World.executeAll aLevel.instructions aLevel.world of
-                Ok w ->
-                    w
+        instruction =
+            aLevel.instructionPointer
+            |> Maybe.map (\index -> List.take 1 <| List.drop index aLevel.instructions)
+            |> Maybe.withDefault []
 
-                -- TODO error handling
-                Err _ ->
-                    aLevel.world
+
+        result =
+            World.executeAll instruction aLevel.world
+
+        nextWorld =
+            result
+                |> Result.withDefault (World.reset aLevel.world)
+
+        notification =
+            case result of
+                Ok _ ->
+                    Silent
+
+                Err (HitAWall instructionPointer _) ->
+                    Problem <| "hit a wall trying to execute instruction #" ++ String.fromInt instructionPointer
+
+                Err (FellInAPit instructionPointer _) ->
+                    Problem <| "fell in a pit trying to execute instruction #" ++ String.fromInt instructionPointer
+
+        aInstructionPointer =
+            case (aLevel.instructionPointer, result) of
+                (Just n, Ok _) ->
+                    Just <| n+1
+
+                _ ->
+                    aLevel.instructionPointer
+   in
+    Level { aLevel | world = nextWorld, notification = notification, instructionPointer = aInstructionPointer }
+
+
+run : Level -> Level
+run (Level aLevel) =
+    let
+        result =
+            World.executeAll aLevel.instructions aLevel.world
+
+        nextWorld =
+            result
+                |> Result.withDefault (World.reset aLevel.world)
+
+        notification =
+            case result of
+                Ok _ ->
+                    Silent
+
+                Err (HitAWall instructionPointer _) ->
+                    Problem <| "hit a wall trying to execute instruction #" ++ String.fromInt instructionPointer
+
+                Err (FellInAPit instructionPointer _) ->
+                    Problem <| "fell in a pit trying to execute instruction #" ++ String.fromInt instructionPointer
+
+        aInstructionPointer =
+            case result of
+                Ok _ ->
+                    Just <| List.length aLevel.instructions
+
+                Err (HitAWall instructionPointer _) ->
+                    Just instructionPointer
+
+                Err (FellInAPit instructionPointer _) ->
+                    Just instructionPointer
     in
-    Level { aLevel | world = nextWorld }
+    Level { aLevel | world = nextWorld, notification = notification, instructionPointer = aInstructionPointer }

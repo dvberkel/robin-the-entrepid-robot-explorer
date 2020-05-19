@@ -1,0 +1,26 @@
+{
+    "index": 2,
+    "world": {
+        "robot": {
+            "location": {"x": 0, "y": 0},
+            "direction": "North"
+        },
+        "maze": {
+            "-1,-1": "Pit",
+            "0,-1": "Floor",
+            "1,-1": "Floor",
+            "-1,0": "Floor",
+            "0,0": "Floor",
+            "1,0": "Floor",
+            "-1,1": "Floor",
+            "0,1": "Floor",
+            "1,1": "Wall",
+            "0,2": "Floor",
+            "0,3": "Pit",
+            "0,4": "Target",
+            "1,2": "Floor",
+            "1,3": "Floor",
+            "1,4": "Floor"
+         }
+    }
+}

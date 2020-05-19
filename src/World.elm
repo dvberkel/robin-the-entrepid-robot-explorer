@@ -82,7 +82,6 @@ type Error
     = HitAWall Int Location
     | FellInAPit Int Location
 
-
 encode : World -> Encode.Value
 encode (World aWorld) =
     Encode.object

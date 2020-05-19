@@ -5,7 +5,7 @@ import World.Robot exposing (Instruction(..))
 
 parse : String -> Result Error (List Instruction)
 parse _ =
-    Ok [ Forward ]
+    Ok [ Forward, Forward, Forward, Forward ]
 
 
 type Error
