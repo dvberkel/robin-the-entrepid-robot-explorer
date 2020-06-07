@@ -46,6 +46,6 @@ Wow, the surge has wiped almost all highlevel functions. With communications dow
 
 Luckily the Motor Driver Processor and Controller Area Network are still operational. This way you can update the motor driver to respond to commands send over the Controller Area Network!
 
-Quick! Patch a connection to CCTV feed and [hack into the Controller Area Network](http://localhost:8000/src/ControlRoom.elm).
+Quick! Patch a connection to CCTV feed and [hack into the Controller Area Network](http://localhost:8000/src/LoadingArea.elm?level=0).
 
 [elm/parser]: https://package.elm-lang.org/packages/elm/parser/latest/ 
