@@ -10,8 +10,8 @@ git clone https://github.com/fifth-postulate/robin-the-entrepid-robot-explorer.g
 
 Change directory and fire up `elm reactor` and read on
 
-### Workhop
-This is a workshop on learning [`elm/parser`][elm/parser]. You learn it creating a parser for a ficticious programming language. But an important language none the less. For it allows you to save Robin the entrepid robot explorer.
+### Workshop
+This is a workshop on learning [`elm/parser`][elm/parser]. You learn it by creating a parser for a ficticious programming language. But an important language none the less. For it allows you to save Robin the entrepid robot explorer.
 
 The workshop is divided into different levels. You will write code as you go, so feel free to apply all the healthy habits you acquired for writing good code. If at any moment you are stuck, don't hesitate to ask questions.
 
