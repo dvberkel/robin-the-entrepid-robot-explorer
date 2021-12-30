@@ -1,17 +1,17 @@
-module World.Json.LocationTest exposing (..)
+module Json.World.GPS.LocationTest exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer, int)
 import Json.Decode as Decode
 import Test exposing (Test, describe, fuzz, test)
 import World.GPS.Location exposing (Location, location)
-import World.Json.GPS.Location as Location
+import Json.World.GPS.Location as Location
 
 
 suite : Test
 suite =
-    describe "World"
-        [ describe "Json"
+    describe "Json"
+        [ describe "World"
             [ describe "GPS"
                 [ describe "Location"
                     [ test "decode" <|

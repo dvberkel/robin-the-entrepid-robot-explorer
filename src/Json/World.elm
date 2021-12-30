@@ -1,11 +1,11 @@
-module World.Json exposing (decode, encode)
+module Json.World exposing (decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 import World exposing (World)
-import World.Json.Maze as Maze
-import World.Json.Robot as Robot
+import Json.World.Maze as Maze
+import Json.World.Robot as Robot
 
 
 encode : World -> Encode.Value

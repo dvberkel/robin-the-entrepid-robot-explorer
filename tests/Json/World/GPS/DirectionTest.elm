@@ -1,17 +1,17 @@
-module World.Json.DirectionTest exposing (..)
+module Json.World.GPS.DirectionTest exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer, constant, oneOf)
 import Json.Decode as Decode
 import Test exposing (Test, describe, fuzz, test)
 import World.GPS.Direction exposing (Direction(..))
-import World.Json.GPS.Direction as Direction
+import Json.World.GPS.Direction as Direction
 
 
 suite : Test
 suite =
-    describe "World"
-        [ describe "Json"
+    describe "Json"
+        [ describe "World"
             [ describe "GPS"
                 [ describe "Direction"
                     [ test "decode North" <|

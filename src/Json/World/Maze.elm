@@ -1,11 +1,11 @@
-module World.Json.Maze exposing (decode, encode)
+module Json.World.Maze exposing (decode, encode)
 
 import Dict exposing (Dict)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import World.GPS.Direction exposing (Direction(..))
 import World.GPS.Location as Location
-import World.Json.Maze.Tile as Tile
+import Json.World.Maze.Tile as Tile
 import World.Maze as Maze exposing (Maze)
 import World.Maze.Tile exposing (Tile)
 

@@ -1,4 +1,4 @@
-module World.Json.GPS.Direction exposing (decode, encode)
+module Json.World.GPS.Direction exposing (decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode

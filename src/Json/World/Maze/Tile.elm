@@ -1,4 +1,4 @@
-module World.Json.Maze.Tile exposing (decode, encode)
+module Json.World.Maze.Tile exposing (decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode

@@ -1,10 +1,10 @@
-module World.Json.Robot exposing (decode, encode)
+module Json.World.Robot exposing (decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import World.Json.GPS.Direction as Direction
-import World.Json.GPS.Location as Location
+import Json.World.GPS.Direction as Direction
+import Json.World.GPS.Location as Location
 import World.Robot as Robot exposing (Robot)
 
 

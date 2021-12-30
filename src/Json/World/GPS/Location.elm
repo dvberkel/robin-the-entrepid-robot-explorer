@@ -1,4 +1,4 @@
-module World.Json.GPS.Location exposing (decode, encode)
+module Json.World.GPS.Location exposing (decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)

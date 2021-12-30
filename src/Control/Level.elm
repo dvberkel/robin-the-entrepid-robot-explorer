@@ -8,8 +8,8 @@ import Http exposing (Error(..))
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline
 import Json.Encode as Encode
+import Json.World as JsonWorld
 import World exposing (Error(..), World)
-import World.Json as Json
 import World.Robot.Instruction as Instruction exposing (Instruction)
 
 
@@ -49,7 +49,7 @@ encode : Level -> Encode.Value
 encode (Level aLevel) =
     Encode.object
         [ ( "index", Encode.int aLevel.index )
-        , ( "world", Json.encode aLevel.world )
+        , ( "world", JsonWorld.encode aLevel.world )
         ]
 
 
@@ -57,7 +57,7 @@ decode : Decoder Level
 decode =
     Decode.succeed level
         |> Pipeline.required "index" Decode.int
-        |> Pipeline.required "world" Json.decode
+        |> Pipeline.required "world" JsonWorld.decode
 
 
 type Msg
