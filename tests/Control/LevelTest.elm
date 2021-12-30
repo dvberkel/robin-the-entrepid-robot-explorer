@@ -1,14 +1,17 @@
 module Control.LevelTest exposing (levelFuzzer, suite)
 
+import Control.Level as Level exposing (Level, level)
 import Expect
 import Fuzz exposing (Fuzzer, int)
 import Json.Decode as Decode
-import Control.Level as Level exposing (Level, level)
 import Test exposing (Test, describe, fuzz, test)
 import World exposing (world)
-import World.GPS exposing (Direction(..), location)
-import World.Maze exposing (Tile(..), emptyMaze, insertTile)
-import World.Robot exposing (Instruction(..), robot)
+import World.GPS.Direction exposing (Direction(..))
+import World.GPS.Location exposing (location)
+import World.Maze exposing (emptyMaze, insertTile)
+import World.Maze.Tile exposing (Tile(..))
+import World.Robot exposing (robot)
+import World.Robot.Instruction exposing (Instruction(..))
 import WorldTest exposing (worldFuzzer)
 
 

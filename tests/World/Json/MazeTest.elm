@@ -1,12 +1,14 @@
-module World.MazeTest exposing (suite, mazeFuzzer)
+module World.Json.MazeTest exposing (mazeFuzzer, suite)
 
 import Expect
 import Fuzz exposing (Fuzzer, constant, list, oneOf)
 import Json.Decode as Decode
 import Test exposing (Test, describe, fuzz, test)
-import World.GPS exposing (Location, location)
-import World.GPSTest exposing (locationFuzzer)
-import World.Maze as Maze exposing (Maze, Tile(..), emptyMaze, insertTile)
+import World.GPS.Location exposing (Location, location)
+import World.Json.LocationTest exposing (locationFuzzer)
+import World.Json.Maze as Maze
+import World.Maze exposing (Maze, emptyMaze, insertTile)
+import World.Maze.Tile exposing (Tile(..))
 
 
 suite : Test

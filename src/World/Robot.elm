@@ -1,12 +1,12 @@
-module World.Robot exposing (Instruction(..), Robot, decode, encode, execute, location, robot, view, instructionToString)
+module World.Robot exposing (Robot, direction, execute, location, robot, view)
 
 import Html.Styled exposing (Html)
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (required)
-import Json.Encode as Encode
 import Svg.Styled as Svg
 import Svg.Styled.Attributes as Attribute
-import World.GPS as GPS exposing (Direction(..), Location, advance, toLeft, toRight)
+import World.GPS as GPS
+import World.GPS.Direction as Direction exposing (Direction(..))
+import World.GPS.Location as Location exposing (Location)
+import World.Robot.Instruction exposing (Instruction(..))
 
 
 type Robot
@@ -17,8 +17,8 @@ type Robot
 
 
 robot : Direction -> Location -> Robot
-robot direction aLocation =
-    Robot { direction = direction, location = aLocation }
+robot aDirection aLocation =
+    Robot { direction = aDirection, location = aLocation }
 
 
 execute : Instruction -> Robot -> Robot
@@ -34,38 +34,19 @@ execute instruction aRobot =
             right aRobot
 
 
-type Instruction
-    = Forward
-    | Left
-    | Right
-
-
-instructionToString : Instruction -> String
-instructionToString instruction =
-    case instruction of
-        Forward ->
-            "Forward"
-
-        Left ->
-            "Left"
-
-        Right ->
-            "Right"
-
-
 forward : Robot -> Robot
 forward (Robot aRobot) =
-    Robot { aRobot | location = advance aRobot.direction aRobot.location }
+    Robot { aRobot | location = GPS.advance aRobot.direction aRobot.location }
 
 
 left : Robot -> Robot
 left (Robot aRobot) =
-    Robot { aRobot | direction = toLeft aRobot.direction }
+    Robot { aRobot | direction = Direction.toLeft aRobot.direction }
 
 
 right : Robot -> Robot
 right (Robot aRobot) =
-    Robot { aRobot | direction = toRight aRobot.direction }
+    Robot { aRobot | direction = Direction.toRight aRobot.direction }
 
 
 location : Robot -> Location
@@ -73,26 +54,16 @@ location (Robot aRobot) =
     aRobot.location
 
 
-encode : Robot -> Encode.Value
-encode (Robot aRobot) =
-    Encode.object
-        [ ( "location", GPS.encodeLocation aRobot.location )
-        , ( "direction", GPS.encodeDirection aRobot.direction )
-        ]
-
-
-decode : Decoder Robot
-decode =
-    Decode.succeed robot
-        |> required "direction" GPS.decodeDirection
-        |> required "location" GPS.decodeLocation
+direction : Robot -> Direction
+direction (Robot aRobot) =
+    aRobot.direction
 
 
 view : Robot -> Html msg
 view (Robot aRobot) =
     let
         ( x, y ) =
-            GPS.coordinates2D aRobot.location
+            Location.coordinates2D aRobot.location
 
         toTranslate coordinates =
             "translate(" ++ coordinates ++ ")"

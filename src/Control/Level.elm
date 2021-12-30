@@ -9,14 +9,15 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline
 import Json.Encode as Encode
 import World exposing (Error(..), World)
-import World.Robot as Robot
+import World.Json as Json
+import World.Robot.Instruction as Instruction exposing (Instruction)
 
 
 type Level
     = Level
         { index : Int
         , world : World
-        , instructions : List Robot.Instruction
+        , instructions : List Instruction
         , instructionPointer : Maybe Int
         , notification : Notification
         }
@@ -48,7 +49,7 @@ encode : Level -> Encode.Value
 encode (Level aLevel) =
     Encode.object
         [ ( "index", Encode.int aLevel.index )
-        , ( "world", World.encode aLevel.world )
+        , ( "world", Json.encode aLevel.world )
         ]
 
 
@@ -56,7 +57,7 @@ decode : Decoder Level
 decode =
     Decode.succeed level
         |> Pipeline.required "index" Decode.int
-        |> Pipeline.required "world" World.decode
+        |> Pipeline.required "world" Json.decode
 
 
 type Msg
@@ -83,7 +84,7 @@ view (Level aLevel) =
     let
         instructions =
             aLevel.instructions
-                |> List.map Robot.instructionToString
+                |> List.map Instruction.toString
                 |> String.join ","
 
         announcement =
@@ -122,7 +123,7 @@ name index =
     prefix ++ String.fromInt index
 
 
-load : List Robot.Instruction -> Level -> Level
+load : List Instruction -> Level -> Level
 load instructions (Level aLevel) =
     Level
         { aLevel
@@ -148,9 +149,8 @@ step (Level aLevel) =
     let
         instruction =
             aLevel.instructionPointer
-            |> Maybe.map (\index -> List.take 1 <| List.drop index aLevel.instructions)
-            |> Maybe.withDefault []
-
+                |> Maybe.map (\index -> List.take 1 <| List.drop index aLevel.instructions)
+                |> Maybe.withDefault []
 
         result =
             World.executeAll instruction aLevel.world
@@ -171,13 +171,13 @@ step (Level aLevel) =
                     Problem <| "fell in a pit trying to execute instruction #" ++ String.fromInt instructionPointer
 
         aInstructionPointer =
-            case (aLevel.instructionPointer, result) of
-                (Just n, Ok _) ->
-                    Just <| n+1
+            case ( aLevel.instructionPointer, result ) of
+                ( Just n, Ok _ ) ->
+                    Just <| n + 1
 
                 _ ->
                     aLevel.instructionPointer
-   in
+    in
     Level { aLevel | world = nextWorld, notification = notification, instructionPointer = aInstructionPointer }
 
 

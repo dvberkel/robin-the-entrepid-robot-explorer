@@ -1,12 +1,16 @@
-module World.RobotTest exposing (robotFuzzer, suite)
+module World.Json.RobotTest exposing (robotFuzzer, suite)
 
 import Expect
 import Fuzz exposing (Fuzzer)
 import Json.Decode as Decode
 import Test exposing (Test, describe, fuzz, test)
-import World.GPS exposing (Direction(..), location)
-import World.GPSTest exposing (directionFuzzer, locationFuzzer)
-import World.Robot as Robot exposing (Instruction(..), Robot, execute, robot)
+import World.GPS.Direction exposing (Direction(..))
+import World.GPS.Location exposing (location)
+import World.Json.DirectionTest exposing (directionFuzzer)
+import World.Json.LocationTest exposing (locationFuzzer)
+import World.Json.Robot as Robot
+import World.Robot exposing (Robot, execute, robot)
+import World.Robot.Instruction exposing (Instruction(..))
 
 
 suite : Test

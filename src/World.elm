@@ -1,14 +1,14 @@
-module World exposing (Error(..), World, decode, encode, executeAll, reset, view, world)
+module World exposing (Error(..), World, executeAll, maze, reset, robot, view, world)
 
 import Html.Styled exposing (Html)
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (required)
-import Json.Encode as Encode
 import Svg.Styled as Svg
 import Svg.Styled.Attributes as Attribute
-import World.GPS as GPS exposing (Location)
-import World.Maze as Maze exposing (Maze, Tile(..), tileAt)
-import World.Robot as Robot exposing (Instruction, Robot)
+import World.GPS.Location as Location exposing (Location)
+import World.Maze as Maze exposing (Maze, tileAt)
+import World.Maze.BoundingBox as BoundingBox
+import World.Maze.Tile exposing (Tile(..))
+import World.Robot as Robot exposing (Robot)
+import World.Robot.Instruction exposing (Instruction)
 
 
 type World
@@ -26,6 +26,16 @@ world aMaze aRobot =
         , initialRobot = aRobot
         , maze = aMaze
         }
+
+
+robot : World -> Robot
+robot (World w) =
+    w.robot
+
+
+maze : World -> Maze
+maze (World w) =
+    w.maze
 
 
 reset : World -> World
@@ -82,34 +92,24 @@ type Error
     = HitAWall Int Location
     | FellInAPit Int Location
 
-encode : World -> Encode.Value
-encode (World aWorld) =
-    Encode.object
-        [ ( "robot", Robot.encode aWorld.robot )
-        , ( "maze", Maze.encode aWorld.maze )
-        ]
-
-
-decode : Decoder World
-decode =
-    Decode.succeed world
-        |> required "maze" Maze.decode
-        |> required "robot" Robot.decode
-
 
 view : World -> Html msg
 view (World aWorld) =
     let
-        ( ll, ur ) =
+        bbox =
             aWorld.maze
                 |> Maze.boundingBox
-                |> Maybe.withDefault ( GPS.location 0 0, GPS.location 1 1 )
+                |> Maybe.withDefault BoundingBox.default
 
         ( minX, minY ) =
-            GPS.coordinates2D ll
+            bbox
+                |> BoundingBox.lowerLeft
+                |> Location.coordinates2D
 
         ( maxX, maxY ) =
-            GPS.coordinates2D ur
+            bbox
+                |> BoundingBox.upperRight
+                |> Location.coordinates2D
                 |> (\( x, y ) -> ( x + 1, y + 1 ))
 
         side =
