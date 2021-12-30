@@ -3,9 +3,9 @@ module Json.World.GPS.LocationTest exposing (..)
 import Expect
 import Fuzz exposing (Fuzzer, int)
 import Json.Decode as Decode
+import Json.World.GPS.Location as Location
 import Test exposing (Test, describe, fuzz, test)
 import World.GPS.Location exposing (Location, location)
-import Json.World.GPS.Location as Location
 
 
 suite : Test

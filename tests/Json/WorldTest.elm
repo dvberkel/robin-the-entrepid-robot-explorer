@@ -3,13 +3,13 @@ module Json.WorldTest exposing (suite, worldFuzzer)
 import Expect
 import Fuzz exposing (Fuzzer)
 import Json.Decode as Decode
+import Json.World as Json
+import Json.World.MazeTest exposing (mazeFuzzer)
+import Json.World.RobotTest exposing (robotFuzzer)
 import Test exposing (Test, describe, fuzz, test)
 import World exposing (Error(..), World, world)
 import World.GPS.Direction exposing (Direction(..))
 import World.GPS.Location exposing (location)
-import Json.World as Json
-import Json.World.MazeTest exposing (mazeFuzzer)
-import Json.World.RobotTest exposing (robotFuzzer)
 import World.Maze exposing (emptyMaze, insertRectangle, insertTile)
 import World.Maze.BoundingBox exposing (bbox)
 import World.Maze.Tile exposing (Tile(..))

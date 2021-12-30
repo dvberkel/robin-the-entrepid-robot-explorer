@@ -3,9 +3,9 @@ module Json.World exposing (decode, encode)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
-import World exposing (World)
 import Json.World.Maze as Maze
 import Json.World.Robot as Robot
+import World exposing (World)
 
 
 encode : World -> Encode.Value
